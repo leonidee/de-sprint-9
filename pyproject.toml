@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "de-sprint-9"
+version = "0.1.0"
+description = ""
+authors = ["leonidee"]
+readme = "README.md"
+packages = [{include = "de_sprint_9"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+redis = "^4.6.0"
+python-dotenv = "^1.0.0"
+kafka-python = "^2.0.2"
+psycopg2-binary = "^2.9.7"
+pyyaml = "^6.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
