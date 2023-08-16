@@ -2,9 +2,8 @@
 name = "de-sprint-9"
 version = "0.1.0"
 description = ""
-authors = ["leonidee"]
+authors = ["Grishenkov Leonid <grishenkovleonid@gmail.com>"]
 readme = "README.md"
-packages = [{include = "de_sprint_9"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

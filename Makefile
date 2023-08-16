@@ -1,32 +1,50 @@
-
+include .env
+export
 
 # kafkacat commands
 run-producer:
-	kcat -b rc1a-j1ulkqntckv14qrd.mdb.yandexcloud.net:9091 \
+	kafkacat -b $$KAFKA_BOOTSTRAP_SERVERS \
 		-X security.protocol=SASL_SSL \
 		-X sasl.mechanisms=SCRAM-SHA-512 \
-		-X sasl.username=producer_consumer \
-		-X sasl.password="4kkDxgdnwuagovH7JuQy" \
+		-X sasl.username=$$KAFKA_USERNAME \
+		-X sasl.password=$$KAFKA_PASSWORD \
 		-X ssl.ca.location=./CA.pem \
-		-P -t order-service_orders -K:
+		-P -t $(topic) -K:
 
 run-consumer:
-	kcat -b rc1a-j1ulkqntckv14qrd.mdb.yandexcloud.net:9091,rc1b-9rnkj4ds3r9g1bpl.mdb.yandexcloud.net:9091 \
+	kafkacat -b $$KAFKA_BOOTSTRAP_SERVERS \
 		-X security.protocol=SASL_SSL \
 		-X sasl.mechanisms=SCRAM-SHA-512 \
-		-X sasl.username=producer_consumer \
-		-X sasl.password="4kkDxgdnwuagovH7JuQy" \
-		-X ssl.ca.location=/Users/leonidgrisenkov/Code/de-sprint-9/CA.pem \
-		-C -o beginning -t order-service_orders \
+		-X sasl.username=$$KAFKA_USERNAME \
+		-X sasl.password=$$KAFKA_PASSWORD \
+		-X ssl.ca.location=./CA.pem \
+		-C -o end -t $(topic) \
 		-f 'Key: %k\nValue: %s\nPartition: %p\nOffset: %o\nTimestamp: %T\n'
 
+do-test:
+	@echo $$YC_REDIS_NAME
 
 # yandex-cloud commands
+# redis
 up-redis:
-	yc managed-redis cluster start de-redis-04
+	yc managed-redis cluster start $$YC_REDIS_NAME
 
 check-redis:
-	yc managed-redis cluster get de-redis-04 | rg "status"
+	yc managed-redis cluster get $$YC_REDIS_NAME | grep -i "status"
 
 down-redis:
-	yc managed-redis cluster stop de-redis-04
+	yc managed-redis cluster stop $$YC_REDIS_NAME
+
+# kafka
+up-kafka:
+	yc managed-kafka cluster start $$YC_KAFKA_NAME
+
+check-kafka:
+	yc managed-kafka cluster get $$YC_KAFKA_NAME | grep -i "status"
+
+down-kafka:
+	yc managed-kafka cluster stop $$YC_KAFKA_NAME
+
+list-kafka-topics:
+	yc managed-kafka topic list --cluster-name $$YC_KAFKA_NAME
+

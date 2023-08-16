@@ -1,0 +1,8 @@
+cloud/
+tests/
+.git/
+.gitignore
+.vscode/
+.venv/
+__pycache__/
+*.pem

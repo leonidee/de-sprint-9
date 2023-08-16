@@ -1,8 +1,10 @@
 import sys
 
-sys.path.append("/Users/leonidgrisenkov/Code/de-sprint-9")
+sys.path.append("/app")
 from src.redis import RedisClient
 
+import dotenv
+dotenv.load_dotenv()
 
 def main():
     r = RedisClient()
