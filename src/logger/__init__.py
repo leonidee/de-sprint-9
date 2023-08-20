@@ -35,21 +35,23 @@ class LogManager(Logger):
         if logger.hasHandlers():
             logger.handlers.clear()
 
-        if self.stream_handler == STREAM_HANDLERS[0]:
-            handler = StreamHandler(stream=sys.stdout)
-        else:
-            raise ValueError(
-                f"Please specify correct handler for output logging stream. Should be one of: {STREAM_HANDLERS}"
-            )
+        match self.stream_handler:
+            case "console":
+                handler = StreamHandler(stream=sys.stdout)
+            case _:
+                raise ValueError(
+                    f"Please specify correct handler for output logging stream. Should be one of: {STREAM_HANDLERS}"
+                )
 
-        if self.level == "DEBUG":
-            message_format = r"[%(asctime)s] {%(name)s.%(funcName)s:%(lineno)d} %(levelname)s: %(message)s"
-        elif self.level == "INFO":
-            message_format = (
-                r"[%(asctime)s] {%(name)s.%(lineno)d} %(levelname)s: %(message)s"
-            )
-        else:
-            message_format = r"[%(asctime)s] {%(name)s} %(levelname)s: %(message)s"
+        match self.level:
+            case "DEBUG":
+                message_format = r"[%(asctime)s] {%(name)s.%(funcName)s:%(lineno)d} %(levelname)s: %(message)s"
+            case "INFO":
+                message_format = (
+                    r"[%(asctime)s] {%(name)s.%(lineno)d} %(levelname)s: %(message)s"
+                )
+            case _:
+                message_format = r"[%(asctime)s] {%(name)s} %(levelname)s: %(message)s"
 
         handler.setFormatter(
             fmt=Formatter(

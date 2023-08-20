@@ -3,10 +3,21 @@ FROM python:3.11.4-bullseye
 USER root
 WORKDIR /app
 
-ARG REDIS_HOST
-ARG REDIS_PORT
-ARG REDIS_PASSWORD
+ARG YC_REDIS_HOST
+ARG YC_REDIS_PORT
+ARG YC_REDIS_PASSWORD
+
+ARG YC_KAFKA_BOOTSTRAP_SERVERS
+ARG YC_KAFKA_USERNAME
+ARG YC_KAFKA_PASSWORD
+
 ARG CERTIFICATE_PATH
+
+ARG YC_POSTGRE_HOST
+ARG YC_POSTGRE_PORT
+ARG YC_POSTGRE_USERNAME
+ARG YC_POSTGRE_PASSWORD
+ARG YC_POSTGRE_DB
 
 RUN apt-get update \
     && apt-get upgrade -y \
@@ -15,8 +26,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Download certificate
-# RUN mkdir -p /crt
-# RUN wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" --output-document /crt/YandexInternalRootCA.crt
 RUN curl "https://storage.yandexcloud.net/cloud-certs/CA.pem" -o /app/CA.pem
 RUN chmod 0600 /app/CA.pem
 

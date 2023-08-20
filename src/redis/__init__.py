@@ -15,13 +15,12 @@ class RedisClient:
         log.debug("Connecting to Redis cluster")
 
         self.client = redis.StrictRedis(
-            host=getenv("REDIS_HOST"),
-            port=getenv("REDIS_PORT"),
-            password=getenv("REDIS_PASSWORD"),
+            host=getenv("YC_REDIS_HOST"),
+            port=getenv("YC_REDIS_PORT"),
+            password=getenv("YC_REDIS_PASSWORD"),
             ssl_ca_certs=getenv("CERTIFICATE_PATH"),
             ssl=True,
         )
-        log.debug("Success!")
 
     def set(self, key: str, value: Dict[Any, Any] | Any):
         self.client.set(key, json.dumps(value))

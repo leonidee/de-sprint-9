@@ -1,7 +1,6 @@
 import sys
 import json
 
-import kafka
 
 sys.path.append("/app")
 from src.kafka import KafkaClient
@@ -21,7 +20,7 @@ def main() -> ...:
     for message in consumer:
         # print(message)
         value = json.loads(message.value)
-        pprint(value)
+        value.keys()
 
 
     # poll = consumer.poll(timeout_ms=1000)

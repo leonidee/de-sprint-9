@@ -3,26 +3,23 @@ export
 
 # kafkacat commands
 run-producer:
-	kafkacat -b $$KAFKA_BOOTSTRAP_SERVERS \
+	kafkacat -b $$YC_KAFKA_BOOTSTRAP_SERVERS \
 		-X security.protocol=SASL_SSL \
 		-X sasl.mechanisms=SCRAM-SHA-512 \
-		-X sasl.username=$$KAFKA_USERNAME \
-		-X sasl.password=$$KAFKA_PASSWORD \
+		-X sasl.username=$$YC_KAFKA_USERNAME \
+		-X sasl.password=$$YC_KAFKA_PASSWORD \
 		-X ssl.ca.location=./CA.pem \
-		-P -t $(topic) -K:
+		-P -t $(topic) -l ./tests/kafka/kafka-input-msg.json
 
 run-consumer:
-	kafkacat -b $$KAFKA_BOOTSTRAP_SERVERS \
+	kafkacat -b $$YC_KAFKA_BOOTSTRAP_SERVERS \
 		-X security.protocol=SASL_SSL \
 		-X sasl.mechanisms=SCRAM-SHA-512 \
-		-X sasl.username=$$KAFKA_USERNAME \
-		-X sasl.password=$$KAFKA_PASSWORD \
+		-X sasl.username=$$YC_KAFKA_USERNAME \
+		-X sasl.password=$$YC_KAFKA_PASSWORD \
 		-X ssl.ca.location=./CA.pem \
-		-C -o end -t $(topic) \
+		-C -o beginning -t $(topic) \
 		-f 'Key: %k\nValue: %s\nPartition: %p\nOffset: %o\nTimestamp: %T\n'
-
-do-test:
-	@echo $$YC_REDIS_NAME
 
 # yandex-cloud commands
 # redis
@@ -47,4 +44,15 @@ down-kafka:
 
 list-kafka-topics:
 	yc managed-kafka topic list --cluster-name $$YC_KAFKA_NAME
+
+# postgresql
+up-pg:
+	yc managed-postgresql cluster start $$YC_POSTGRE_NAME
+
+check-pg:
+	yc managed-postgresql cluster get $$YC_POSTGRE_NAME | grep -i "status"
+
+down-pg:
+	yc managed-postgresql cluster stop $$YC_POSTGRE_NAME
+
 
