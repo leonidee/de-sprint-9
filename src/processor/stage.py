@@ -34,7 +34,7 @@ class Payload:
     status: str
     restaurant: dict
     user: dict
-    products: dict
+    products: list
 
 
 class STGMessageProcessor:
@@ -43,10 +43,11 @@ class STGMessageProcessor:
     def __init__(self) -> None:
         kafka = KafkaClient()
         
-        self.consumer = kafka.get_consumer()
-        self.producer = kafka.get_producer()
         self.pg = PGClient()
         self.redis = RedisClient()
+
+        self.consumer = kafka.get_consumer()
+        self.producer = kafka.get_producer()
 
     def insert_order_event_row(self, message: OrderEvent) -> ...:
 
@@ -160,21 +161,27 @@ class STGMessageProcessor:
 
         log.info(f"Subscribed to {topic}")
 
+        log.info("Processing messages...")
         for message in self.consumer:
-            log.info(f"Processing message. Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}")
 
-            value = json.loads(message.value)
+            log.info(f"Processing Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}")
 
-            if value['object_type'] == 'order':
+            value: dict = json.loads(message.value)
 
-                self.insert_order_event_row(
-                    message=self.get_order_event(value)
-                )
 
-                self.producer.send(
-                    topic="stg-service-orders",
-                    value=json.dumps(dataclasses.asdict(self.get_output_message(value))).encode("utf-8"),
-                )
+            if all(key in value for key in ('object_id', 'object_type', 'sent_dttm', 'payload')): # Workaround for unexpected format messages
+
+                if value['object_type'] == 'order': # In this step we need only 'order' messages
+
+                    self.insert_order_event_row(
+                        message=self.get_order_event(value)
+                    )
+
+                    self.producer.send(
+                        topic="stg-service-orders",
+                        value=json.dumps(dataclasses.asdict(self.get_output_message(value))).encode("utf-8"),
+                    )
+                else:
+                    continue
             else:
                 continue
-

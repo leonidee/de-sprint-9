@@ -3,20 +3,17 @@ from logging import Formatter, Logger, StreamHandler, getLogger
 
 import yaml
 
-STREAM_HANDLERS: list = ["console"]
-
-
 class LogManager(Logger):
     """Python Logging Manager for project."""
 
-    __slots__ = ("level", "stream_handler")
+    __slots__ = ("level", "handler")
 
     def __init__(self) -> None:
-        with open("/app/project-config.yaml") as f:
+        with open("/app/config.yaml") as f:
             config = yaml.safe_load(f)
 
         self.level = config["logging"]["level"].upper()
-        self.stream_handler = config["logging"]["stream-handler"]
+        self.handler = config["logging"]["handler"]
 
     def get_logger(self, name: str) -> Logger:
         """Returns configured Logger instance.
@@ -35,12 +32,14 @@ class LogManager(Logger):
         if logger.hasHandlers():
             logger.handlers.clear()
 
-        match self.stream_handler:
+        match self.handler:
             case "console":
+                handler = StreamHandler(stream=sys.stdout)
+            case "localfile":
                 handler = StreamHandler(stream=sys.stdout)
             case _:
                 raise ValueError(
-                    f"Please specify correct handler for output logging stream. Should be one of: {STREAM_HANDLERS}"
+                    f"Please specify correct handler for logging output"
                 )
 
         match self.level:

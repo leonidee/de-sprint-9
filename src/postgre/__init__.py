@@ -19,7 +19,5 @@ class PGClient:
             sslrootcert=getenv('CERTIFICATE_PATH'),           
         )
 
-    def connect(self) -> ...:
-        log.debug(f"Connecting to PostgreSQL")
-
+    def connect(self):
         return psycopg2.connect(**self.properties)

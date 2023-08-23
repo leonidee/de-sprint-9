@@ -15,21 +15,17 @@ services:
       - |
         cd /app \
         && . $(poetry env info --path)/bin/activate \
-        && python /app/services/stg-collector-app/test.py
+        && python /app/services/stg-collector-app/t.py
     volumes:
       - ./.:/app/.
-    restart: unless-stopped
+    restart: no 
     networks:
       - internal
     environment:
-      # FLASK_APP: ${STG_SERVICE_APP_NAME:-stg_service}
-      # DEBUG: ${STG_SERVICE_DEBUG:-True}
 
       YC_KAFKA_BOOTSTRAP_SERVERS: ${YC_KAFKA_BOOTSTRAP_SERVERS}
       YC_KAFKA_USERNAME: ${YC_KAFKA_USERNAME}
       YC_KAFKA_PASSWORD: ${YC_KAFKA_PASSWORD}
-      # KAFKA_SOURCE_TOPIC: ${KAFKA_SOURCE_TOPIC}
-      # KAFKA_DESTINATION_TOPIC: ${KAFKA_STG_SERVICE_ORDERS_TOPIC}
 
       YC_REDIS_HOST: ${YC_REDIS_HOST}
       YC_REDIS_PORT: ${YC_REDIS_PORT}

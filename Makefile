@@ -9,7 +9,7 @@ run-producer:
 		-X sasl.username=$$YC_KAFKA_USERNAME \
 		-X sasl.password=$$YC_KAFKA_PASSWORD \
 		-X ssl.ca.location=./CA.pem \
-		-P -t $(topic) -l ./tests/kafka/kafka-input-msg.json
+		-P -t $(topic) -l /home/leonide/code/de-sprint-9/tests/kafka/producer/kafka-input-msg.json
 
 run-consumer:
 	kafkacat -b $$YC_KAFKA_BOOTSTRAP_SERVERS \
@@ -41,6 +41,9 @@ check-kafka:
 
 down-kafka:
 	yc managed-kafka cluster stop $$YC_KAFKA_NAME
+
+create-kafka-topic:
+	yc managed-kafka topic create $(topic) --cluster-name $$YC_KAFKA_NAME --partitions 1 --replication-factor 1 --compression-type gzip
 
 list-kafka-topics:
 	yc managed-kafka topic list --cluster-name $$YC_KAFKA_NAME
