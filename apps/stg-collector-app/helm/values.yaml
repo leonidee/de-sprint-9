@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: cr.yandex/crpirqoff1mo9jl1l5pd/stg-collector-app
+  pullPolicy: IfNotPresent
+  tag: "v20230826-r1"
+
+containerPort: 5000
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

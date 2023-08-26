@@ -6,36 +6,8 @@ networks:
 
 services:
   stg-collector-app:
-    build: 
-      dockerfile: docker/stg-collector-app/Dockerfile
+    image: cr.yandex/$YC_REGISTRY_ID/stg-collector-app:v20230826-r1
     container_name: stg-collector-app
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cd /app \
-        && . $(poetry env info --path)/bin/activate \
-        && python /app/services/stg-collector-app/t.py
-    volumes:
-      - ./.:/app/.
     restart: no 
     networks:
       - internal
-    environment:
-
-      YC_KAFKA_BOOTSTRAP_SERVERS: ${YC_KAFKA_BOOTSTRAP_SERVERS}
-      YC_KAFKA_USERNAME: ${YC_KAFKA_USERNAME}
-      YC_KAFKA_PASSWORD: ${YC_KAFKA_PASSWORD}
-
-      YC_REDIS_HOST: ${YC_REDIS_HOST}
-      YC_REDIS_PORT: ${YC_REDIS_PORT}
-      YC_REDIS_PASSWORD: ${YC_REDIS_PASSWORD}
-
-      CERTIFICATE_PATH: ${CERTIFICATE_PATH}
-
-      YC_POSTGRE_HOST: ${YC_POSTGRE_HOST}
-      YC_POSTGRE_PORT: ${YC_POSTGRE_PORT}
-      YC_POSTGRE_USERNAME: ${YC_POSTGRE_USERNAME}
-      YC_POSTGRE_PASSWORD: ${YC_POSTGRE_PASSWORD}
-      YC_POSTGRE_DB: ${YC_POSTGRE_DB}
-    

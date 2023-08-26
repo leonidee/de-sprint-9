@@ -1,6 +1,5 @@
 from os import getenv
 import time
-import sys
 import kafka
 from src.logger import LogManager
 
@@ -23,23 +22,23 @@ class KafkaClient:
     def get_producer(self) -> kafka.KafkaProducer:
         log.debug("Connecting to Kafka cluster in producer mode")
 
-        for i in range(1, 10):
+        for i in range(1, 10+1):
             try:
                 return kafka.KafkaProducer(**self.properties)
             except kafka.errors.NoBrokersAvailable as err:
 
                 if i == 10:
                     raise err
+                else:
+                    log.warning(f"{err}. Retrying...")
+                    time.sleep(10)
 
-                log.warning(f"{err}. Retrying...")
-                time.sleep(10)
-
-                continue
+                    continue
 
     def get_consumer(self) -> kafka.KafkaConsumer:
         log.debug("Connecting to Kafka cluster in consumer mode")
 
-        for i in range(1, 10):
+        for i in range(1, 10+1):
             try:
                 return kafka.KafkaConsumer(
                     **self.properties,
@@ -48,11 +47,10 @@ class KafkaClient:
             except kafka.errors.NoBrokersAvailable as err:
 
                 if i == 10:
-                    log.error(err)
-                    break
+                    raise err
+                else:
+                    log.warning(f"{err}. Retrying...")
+                    time.sleep(10)
 
-                log.warning(f"{err}. Retrying...")
-                time.sleep(10)
-
-                continue
+                    continue
 

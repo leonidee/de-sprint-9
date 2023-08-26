@@ -1,6 +1,7 @@
 import time
+from typing import NoReturn
 
-def main():
+def main() -> NoReturn:
 
     i = 1
     while True:

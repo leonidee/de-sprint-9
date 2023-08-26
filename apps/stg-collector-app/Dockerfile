@@ -3,22 +3,6 @@ FROM python:3.11.4-bullseye
 USER root
 WORKDIR /app
 
-ARG YC_REDIS_HOST
-ARG YC_REDIS_PORT
-ARG YC_REDIS_PASSWORD
-
-ARG YC_KAFKA_BOOTSTRAP_SERVERS
-ARG YC_KAFKA_USERNAME
-ARG YC_KAFKA_PASSWORD
-
-ARG CERTIFICATE_PATH
-
-ARG YC_POSTGRE_HOST
-ARG YC_POSTGRE_PORT
-ARG YC_POSTGRE_USERNAME
-ARG YC_POSTGRE_PASSWORD
-ARG YC_POSTGRE_DB
-
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y curl \
@@ -34,9 +18,11 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry $(whic
 
 ENV PATH="/opt/poetry/bin:$PATH"
 
-COPY ./pyproject.toml /app/pyproject.toml
-COPY ./poetry.lock /app/poetry.lock
+COPY . /app
 
 RUN poetry env use $(which python3) \
     && . $(poetry env info --path)/bin/activate \
     && poetry install
+
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD [". $(poetry env info --path)/bin/activate && python /app/apps/stg-collector-app/run.py"]
