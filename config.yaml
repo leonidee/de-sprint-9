@@ -1,3 +1,24 @@
 logging:
   level: debug
   handler: console # localfile / console
+
+topics:
+  order-service-orders: &order-service-orders.topic order-service_orders # order-app-orders
+  stg-processor-output: &stg-processor-output.topic stg-service-orders # stg-collector-app-orders
+
+apps:
+  stg-collector-app:
+    topic.in: *order-service-orders.topic
+    topic.out: *stg-processor-output.topic
+    target-tables:
+      order-events: stg.order_events
+
+  dds-collector-app:
+    topic.in: *stg-processor-output.topic
+    target-tables:
+      hubs:
+        h_category: h_category
+      satelities:
+      links:
+
+  cdm-collector-app:
