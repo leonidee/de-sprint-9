@@ -22,7 +22,6 @@ class MessageProcessor(ABC):
         self.producer = kafka.get_producer()
 
         with open("/app/config.yaml") as f:
-
             config_file = yaml.safe_load(f)
 
         self.environ = config_file['environ']

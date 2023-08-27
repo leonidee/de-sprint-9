@@ -3,16 +3,10 @@ from __future__ import annotations
 import dataclasses
 import json
 import sys
-from abc import ABC, abstractmethod
 from datetime import datetime
 
-import yaml
-
-from src.kafka import KafkaClient
 from src.logger import LogManager
-from src.postgre import PGClient
 from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
-from src.redis import RedisClient
 
 log = LogManager().get_logger(__name__)
 
@@ -122,7 +116,7 @@ class STGMessageProcessor(MessageProcessor):
 
         return order_event
 
-    def _get_output_message(self, value: dict) -> OutputMessage:
+    def _get_output_message(self, value: dict) -> STGAppOutputMessage:
         def get_category_name(restaurant_id: str, product_id: str) -> str | None:
             menu = self.redis.get(key=restaurant_id)["menu"]
 
@@ -147,7 +141,7 @@ class STGMessageProcessor(MessageProcessor):
 
             products.append(d)
 
-        message = OutputMessage(
+        message = STGAppOutputMessage(
             object_id=object_id,
             object_type=object_type,
             payload=Payload(

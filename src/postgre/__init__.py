@@ -14,6 +14,9 @@ class PGClient:
         self.environ = environ
 
     def get_connection(self):
+
+        log.debug("Connecting to PostgreSQL")
+
         match self.environ:
             case 'prod':
                 properties = dict(

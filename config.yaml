@@ -20,7 +20,11 @@ apps:
       topic-in: *stg-processor-output-topic
       target-tables:
         hubs:
-          h_category: h_category
+          category: h_category
+          order: h_order
+          product: h_product
+          restaurant: h_restaurant
+          user: h_user
         satelities:
         links:
 
