@@ -1,5 +1,6 @@
-import psycopg2
 from os import getenv
+
+import psycopg2
 
 from src.logger import LogManager
 
@@ -7,17 +8,32 @@ log = LogManager().get_logger(name=__name__)
 
 
 class PGClient:
-    def __init__(self) -> None:
+    __slots__ = ("environ",)
 
-        self.properties = dict(
-            dbname=getenv('YC_POSTGRE_DB'),      
-            user=getenv('YC_POSTGRE_USERNAME'),        
-            password=getenv('YC_POSTGRE_PASSWORD'),        
-            host=getenv('YC_POSTGRE_HOST'),        
-            port=getenv('YC_POSTGRE_PORT'),
-            sslmode="verify-full", 
-            sslrootcert=getenv('CERTIFICATE_PATH'),           
-        )
+    def __init__(self, environ: str) -> None:
+        self.environ = environ
 
-    def connect(self):
-        return psycopg2.connect(**self.properties)
+    def get_connection(self):
+        match self.environ:
+            case 'prod':
+                properties = dict(
+                    dbname=getenv("YC_POSTGRE_DB"),
+                    user=getenv("YC_POSTGRE_USERNAME"),
+                    password=getenv("YC_POSTGRE_PASSWORD"),
+                    host=getenv("YC_POSTGRE_HOST"),
+                    port=getenv("YC_POSTGRE_PORT"),
+                    sslmode="verify-full",
+                    sslrootcert=getenv("CERTIFICATE_PATH"),
+                )
+            case 'test':
+                properties = dict(
+                    dbname=getenv("YC_POSTGRE_DB"),
+                    user=getenv("YC_POSTGRE_USERNAME"),
+                    password=getenv("YC_POSTGRE_PASSWORD"),
+                    host=getenv("YC_POSTGRE_HOST"),
+                    port=getenv("YC_POSTGRE_PORT"),
+                    sslmode="verify-full",
+                    sslrootcert=getenv("CERTIFICATE_PATH"),
+                )
+
+        return psycopg2.connect(**properties)  # type: ignore

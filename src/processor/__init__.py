@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+from src.processor.dds import DDSMessageProcessor
 from src.processor.stg import STGMessageProcessor
 
-__all__ = ['STGMessageProcessor']
+__all__ = ["STGMessageProcessor", "DDSMessageProcessor"]

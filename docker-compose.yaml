@@ -4,10 +4,22 @@ networks:
   internal:
     driver: bridge
 
+x-apps-common: &apps-common
+  restart: no 
+  networks:
+    - internal
+
 services:
   stg-collector-app:
-    image: cr.yandex/$YC_REGISTRY_ID/stg-collector-app:v20230826-r1
+    build:
+      dockerfile: ./apps/stg-collector-app/Dockerfile
     container_name: stg-collector-app
-    restart: no 
-    networks:
-      - internal
+    <<: *apps-common
+
+
+  dds-collector-app:
+    build:
+      dockerfile: ./apps/dds-collector-app/Dockerfile
+    container_name: dds-collector-app
+    <<: *apps-common
+

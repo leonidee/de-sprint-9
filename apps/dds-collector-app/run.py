@@ -2,13 +2,13 @@ import sys
 
 sys.path.append("/app")
 from src.logger import LogManager
-from src.processor import STGMessageProcessor
+from src.processor import DDSMessageProcessor
 
 log = LogManager().get_logger(__name__)
 
 
 def main() -> ...:
-    proc = STGMessageProcessor()
+    proc = DDSMessageProcessor()
     proc.run()
 
 
