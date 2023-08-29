@@ -1,6 +1,7 @@
 from os import getenv
 
 import psycopg2
+import yaml
 
 from src.logger import LogManager
 
@@ -14,11 +15,10 @@ class PGClient:
         self.environ = environ
 
     def get_connection(self):
-
         log.debug("Connecting to PostgreSQL")
 
         match self.environ:
-            case 'prod':
+            case "prod":
                 properties = dict(
                     dbname=getenv("YC_POSTGRE_DB"),
                     user=getenv("YC_POSTGRE_USERNAME"),
@@ -28,7 +28,7 @@ class PGClient:
                     sslmode="verify-full",
                     sslrootcert=getenv("CERTIFICATE_PATH"),
                 )
-            case 'test':
+            case "test":
                 properties = dict(
                     dbname=getenv("YC_POSTGRE_DB"),
                     user=getenv("YC_POSTGRE_USERNAME"),

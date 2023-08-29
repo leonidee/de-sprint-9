@@ -20,13 +20,22 @@ apps:
       topic-in: *stg-processor-output-topic
       target-tables:
         hubs:
-          category: h_category
-          order: h_order
-          product: h_product
-          restaurant: h_restaurant
-          user: h_user
-        satelities:
+          user: dds.h_user
+          restaurant: dds.h_restaurant
+          order: dds.h_order
+          category: dds.h_category
+          product: dds.h_product
         links:
+          order-product: dds.l_order_product
+          order-user: dds.l_order_user
+          product-category: dds.l_product_category
+          product-restaurant: dds.l_product_restaurant
+        satelities:
+          order-cost: dds.s_order_cost
+          order-status: dds.s_order_status
+          product-names: dds.s_product_names
+          restaurant-names: dds.s_restaurant_names
+          user-names: dds.s_user_names
 
     cdm-collector-app:
 

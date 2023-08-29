@@ -36,3 +36,10 @@ cd /apps/stg-collector-app/helm
 ```shell
 helm upgrade --install --atomic stg-collector-app . -n c12-leonid-grishenkov 
 ```
+
+
+---
+
+
+
+

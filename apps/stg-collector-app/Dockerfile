@@ -22,7 +22,7 @@ COPY . /app
 
 RUN poetry env use $(which python3) \
     && . $(poetry env info --path)/bin/activate \
-    && poetry install
+    && poetry install --only stg-collector-app
 
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD [". $(poetry env info --path)/bin/activate && python /app/apps/stg-collector-app/run.py"]

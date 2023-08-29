@@ -14,7 +14,7 @@ class RedisClient:
     def __init__(self) -> None:
         log.debug("Connecting to Redis cluster")
 
-        self.client = redis.StrictRedis(
+        self.client = redis.Redis(
             host=getenv("YC_REDIS_HOST"),
             port=getenv("YC_REDIS_PORT"),
             password=getenv("YC_REDIS_PASSWORD"),
