@@ -7,6 +7,7 @@ environ: prod # prod / test
 topics:
   order-service-orders: &order-service-orders-topic order-service_orders # order-app-orders
   stg-processor-output: &stg-processor-output-topic stg-service-orders # stg-collector-app-orders
+  dds-processor-outout: &dds-processor-output-topic dds-collector-app-orders # dds-collector-app-orders
 
 apps:
   prod:
@@ -18,6 +19,7 @@ apps:
 
     dds-collector-app:
       topic-in: *stg-processor-output-topic
+      topic-out: *dds-processor-output-topic
       target-tables:
         hubs:
           user: dds.h_user

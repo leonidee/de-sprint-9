@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import dataclasses
 import json
 import sys
+from datetime import datetime
 
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload
@@ -77,6 +79,13 @@ class DDSMessageProcessor(MessageProcessor):
                     self.insert_hubs(builder)
                     self.insert_links(builder)
                     self.insert_satelities(builder)
+
+                    self.producer.send(
+                        topic=self.config["topic-out"],
+                        value=json.dumps(
+                            dataclasses.asdict(self._get_output_message(builder))
+                        ).encode("utf-8"),
+                    )
 
                 else:
                     continue
@@ -363,3 +372,42 @@ class DDSMessageProcessor(MessageProcessor):
             self.pg.close()
 
             sys.exit(1)
+
+    def _get_output_message(self, builder: Builder) -> DDSAppOutputMessage:
+        return DDSAppOutputMessage(
+            object_id=str(builder.get_h_order().h_order_pk),
+            object_type="order-report",
+            send_dttm=datetime.now(),
+            payload=OutPayload(
+                order_id=str(builder.get_h_order().h_order_pk),
+                order_dt=builder.get_h_order().order_dt,
+                status=builder.get_s_order_status().status,
+                restaurant=dict(
+                    id=str(builder.get_h_restaurant().h_restaurant_pk),
+                    name=builder.get_s_restaurant_names().name,
+                ),
+                user=dict(
+                    id=str(builder.get_h_user().h_user_pk),
+                    username=builder.get_s_user_names().username,
+                ),
+                products=builder.get_products_for_output_message(),
+            ),
+        )
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
+class DDSAppOutputMessage:
+    object_id: str
+    object_type: str
+    send_dttm: datetime
+    payload: OutPayload
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
+class OutPayload:
+    order_id: str
+    order_dt: datetime
+    status: str
+    restaurant: dict
+    user: dict
+    products: list

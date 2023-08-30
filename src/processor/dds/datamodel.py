@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import dataclasses
 import json
 import sys
 import uuid
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Generator, List
 
@@ -17,8 +17,10 @@ from src.redis import RedisClient
 
 log = LogManager().get_logger(__name__)
 
+DEFAULT_KWARGS = dict(slots=True, frozen=True)
 
-@dataclasses.dataclass(slots=True, frozen=True)
+
+@dataclass(**DEFAULT_KWARGS)
 class HubUser:
     h_user_pk: uuid.UUID
     user_id: str
@@ -26,7 +28,7 @@ class HubUser:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class HubRestaurant:
     h_restaurant_pk: uuid.UUID
     restaurant_id: str
@@ -34,7 +36,7 @@ class HubRestaurant:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class HubOrder:
     h_order_pk: uuid.UUID
     order_id: int
@@ -43,7 +45,7 @@ class HubOrder:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class HubCategory:
     h_category_pk: uuid.UUID
     category_name: str
@@ -51,7 +53,7 @@ class HubCategory:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class HubProduct:
     h_product_pk: uuid.UUID
     product_id: str
@@ -59,7 +61,7 @@ class HubProduct:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class LinkOrderProduct:
     hk_order_product_pk: uuid.UUID
     h_order_pk: uuid.UUID
@@ -68,7 +70,7 @@ class LinkOrderProduct:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class LinkOrderUser:
     hk_order_user_pk: uuid.UUID
     h_order_pk: uuid.UUID
@@ -77,7 +79,7 @@ class LinkOrderUser:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class LinkProductCategory:
     hk_product_category_pk: uuid.UUID
     h_product_pk: uuid.UUID
@@ -86,7 +88,7 @@ class LinkProductCategory:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class LinkProductRestaurant:
     hk_product_restaurant_pk: uuid.UUID
     h_product_pk: uuid.UUID
@@ -95,7 +97,7 @@ class LinkProductRestaurant:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class SatOrderCost:
     h_order_pk: uuid.UUID
     cost: float
@@ -104,7 +106,7 @@ class SatOrderCost:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class SatOrderStatus:
     h_order_pk: uuid.UUID
     status: str
@@ -112,7 +114,7 @@ class SatOrderStatus:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class SatProductNames:
     h_product_pk: uuid.UUID
     name: str
@@ -120,7 +122,7 @@ class SatProductNames:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class SatRestaurantNames:
     h_restaurant_pk: uuid.UUID
     name: str
@@ -128,7 +130,7 @@ class SatRestaurantNames:
     load_src: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(**DEFAULT_KWARGS)
 class SatUserNames:
     h_user_pk: uuid.UUID
     username: str
