@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
  yc managed-kafka topic create stg-service-orders \
     --cluster-name de-kafka-01 \
