@@ -4,6 +4,7 @@ import dataclasses
 import json
 import sys
 from datetime import datetime
+from json.decoder import JSONDecodeError
 
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
@@ -47,8 +48,11 @@ class STGMessageProcessor(MessageProcessor):
             log.info(
                 f"Processing -> Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}"
             )
-
-            value: dict = json.loads(message.value)
+            try:
+                value: dict = json.loads(message.value)
+            except JSONDecodeError:
+                log.warning(f"Unable to decode {message.offset} offset. Skipping")
+                continue
 
             if all(
                 key in value

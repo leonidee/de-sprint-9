@@ -9,7 +9,7 @@ run-producer:
 		-X sasl.username=$$YC_KAFKA_USERNAME \
 		-X sasl.password=$$YC_KAFKA_PASSWORD \
 		-X ssl.ca.location=./CA.pem \
-		-P -t $(topic) -l /home/leonide/code/de-sprint-9/tests/kafka/producer/kafka-input-msg.json
+		-P -t $(topic)
 
 run-consumer:
 	kafkacat -b $$YC_KAFKA_BOOTSTRAP_SERVERS \

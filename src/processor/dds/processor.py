@@ -4,6 +4,7 @@ import dataclasses
 import json
 import sys
 from datetime import datetime
+from json.decoder import JSONDecodeError
 
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload
@@ -32,6 +33,7 @@ class DDSMessageProcessor(MessageProcessor):
         self.consumer.subscribe(self.config["topic-in"])
 
         log.info(f'Subscribed to {self.config["topic-in"]}')
+        log.info(f'Will output to {self.config["topic-out"]}')
 
         log.info("Processing messages...")
 
@@ -39,8 +41,11 @@ class DDSMessageProcessor(MessageProcessor):
             log.info(
                 f"Processing -> Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}"
             )
-
-            value: dict = json.loads(message.value)
+            try:
+                value: dict = json.loads(message.value)
+            except JSONDecodeError:
+                log.warning(f"Unable to decode {message.offset} offset. Skipping")
+                continue
 
             if all(
                 key in value for key in ("object_id", "object_type", "payload")
@@ -374,13 +379,14 @@ class DDSMessageProcessor(MessageProcessor):
             sys.exit(1)
 
     def _get_output_message(self, builder: Builder) -> DDSAppOutputMessage:
+        log.debug("Collecting output message for kafka")
         return DDSAppOutputMessage(
             object_id=str(builder.get_h_order().h_order_pk),
             object_type="order-report",
-            send_dttm=datetime.now(),
+            send_dttm=datetime.now().strftime(r"%Y-%m-%d, %H:%M:%S"),
             payload=OutPayload(
                 order_id=str(builder.get_h_order().h_order_pk),
-                order_dt=builder.get_h_order().order_dt,
+                order_dt=str(builder.get_h_order().order_dt),
                 status=builder.get_s_order_status().status,
                 restaurant=dict(
                     id=str(builder.get_h_restaurant().h_restaurant_pk),
@@ -399,14 +405,14 @@ class DDSMessageProcessor(MessageProcessor):
 class DDSAppOutputMessage:
     object_id: str
     object_type: str
-    send_dttm: datetime
+    send_dttm: str
     payload: OutPayload
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
 class OutPayload:
     order_id: str
-    order_dt: datetime
+    order_dt: str
     status: str
     restaurant: dict
     user: dict

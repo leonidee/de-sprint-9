@@ -1,4 +1,5 @@
 import json
+import time
 from os import getenv
 from typing import Any, Dict
 
@@ -6,6 +7,8 @@ import redis
 from src.logger import LogManager
 
 log = LogManager().get_logger(__name__)
+
+DELAY = 2  # Delay in sec between attemts to connect or do something
 
 
 class RedisClient:
@@ -22,15 +25,35 @@ class RedisClient:
             ssl=True,
         )
 
-    def set(self, key: str, value: Dict[Any, Any] | Any):
-        self.client.set(key, json.dumps(value))
+    def set(self, key: str, value: Dict[Any, Any] | Any) -> ...:
+        for i in range(1, 10 + 1):
+            try:
+                self.client.set(key, json.dumps(value))
+            except redis.exceptions.ConnectionError as err:
+                if i == 10:
+                    raise err
+                else:
+                    log.warning(f"{err}. Retrying...")
+                    time.sleep(DELAY)
+
+                    continue
 
         log.debug(f"Successfully set '{key}' key")
 
     def get(self, key: str) -> Dict[Any, Any]:
         log.debug(f"Getting '{key}' key")
 
-        result = self.client.get(key)
+        for i in range(1, 10 + 1):
+            try:
+                result = self.client.get(key)
+            except redis.exceptions.ConnectionError as err:
+                if i == 10:
+                    raise err
+                else:
+                    log.warning(f"{err}. Retrying...")
+                    time.sleep(DELAY)
+
+                    continue
 
         if not result:
             raise KeyError(f"No such key -> '{key}'")

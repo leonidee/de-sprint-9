@@ -1,55 +1,43 @@
 {
-    "object_id": 2413008,
-    "object_type": "order",
+    "object_id": "adea5a02-febe-542b-8857-bff2ff293eb0",
+    "object_type": "order-report",
+    "send_dttm": "2023-09-03, 17:52:12",
     "payload": {
-        "id": 2413008,
-        "date": "2023-08-19 12:41:36",
-        "cost": 3373,
-        "payment": 3373,
-        "status": "CLOSED",
+        "order_id": "adea5a02-febe-542b-8857-bff2ff293eb0",
+        "order_dt": "2023-08-27 15:34:58",
+        "status": "CANCELLED",
         "restaurant": {
-            "id": "ef8c42c19b7518a9aebec106",
-            "name": "\u0412\u043a\u0443\u0441 \u0418\u043d\u0434\u0438\u0438"
+            "id": "b063b7b4-5bbb-5424-9d9c-549fe7edb51d",
+            "name": "PLove"
         },
         "user": {
-            "id": "626a81ce9a8cd1920641e26a",
-            "name": "\u0415\u043a\u0430\u0442\u0435\u0440\u0438\u043d\u0430 \u0410\u0440\u0442\u0435\u043c\u043e\u0432\u043d\u0430 \u041a\u0438\u0441\u0435\u043b\u0435\u0432\u0430"
+            "id": "f3baa883-3fba-520e-9e9a-8a5980f6abe8",
+            "username": "\u0421\u0432\u0435\u0442\u043b\u0430\u043d\u0430 \u0412\u0430\u043b\u0435\u0440\u0438\u0435\u0432\u043d\u0430 \u041a\u043e\u0440\u043d\u0438\u043b\u043e\u0432\u0430"
         },
         "products": [
             {
-                "id": "62a9453ca09d774bcea1ad45",
-                "name": "\u0411\u0440\u0438\u0430\u043d\u0438 \u0441 \u044f\u0433\u043d\u0435\u043d\u043a\u043e\u043c",
-                "price": 650,
-                "quantity": 2,
-                "category": "\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0431\u043b\u044e\u0434\u0430"
-            },
-            {
-                "id": "2c0b49dd92d3e411f8f5fabd",
-                "name": "\u0421\u043b\u0430\u0434\u043a\u0438\u0439 \u041b\u0430\u0441\u0441\u0438",
-                "price": 150,
+                "product_id": "922d0c3b-4440-5bb5-b884-888973240271",
+                "product_name": "\u041b\u0430\u0433\u043c\u0430\u043d",
+                "price": 350,
                 "quantity": 1,
-                "category": "\u041d\u0430\u043f\u0438\u0442\u043a\u0438"
+                "category_id": "5f2bd497-da00-5ac4-b4a7-3f00c6551edc",
+                "category_name": "\u0421\u0443\u043f\u044b"
             },
             {
-                "id": "36d54f529ef3ac5e05210178",
-                "name": "\u0411\u0430\u0442\u0442\u0435\u0440 \u0427\u0438\u043a\u043a\u0435",
-                "price": 599,
+                "product_id": "8f3ffedf-a380-52e7-83be-11bdddc9f506",
+                "product_name": "\u041c\u0430\u043d\u0442\u044b \u0441 \u0433\u043e\u0432\u044f\u0434\u0438\u043d\u043e\u0439 3\u0448\u0442",
+                "price": 250,
                 "quantity": 1,
-                "category": "\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0431\u043b\u044e\u0434\u0430"
+                "category_id": "0dd20aff-3946-5296-a371-d5fbe8977de8",
+                "category_name": "\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0431\u043b\u044e\u0434\u0430"
             },
             {
-                "id": "080d4248a4673012342b116a",
-                "name": "\u041c\u0443\u0442\u0442\u043e\u043d \u041a\u0430\u0440\u0440\u0438",
-                "price": 649,
-                "quantity": 1,
-                "category": "\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0431\u043b\u044e\u0434\u0430"
-            },
-            {
-                "id": "9228453584d3056edaca3e90",
-                "name": "\u0427\u0438\u0437 \u041d\u0430\u0430\u043d",
-                "price": 225,
-                "quantity": 3,
-                "category": "\u0412\u044b\u043f\u0435\u0447\u043a\u0430"
+                "product_id": "13189c5b-2228-56ee-9539-358f8d3919bf",
+                "product_name": "\u041f\u043b\u043e\u0432 \u0447\u0430\u0439\u0445\u0430\u043d\u0441\u043a\u0438\u0439",
+                "price": 420,
+                "quantity": 4,
+                "category_id": "0dd20aff-3946-5296-a371-d5fbe8977de8",
+                "category_name": "\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0431\u043b\u044e\u0434\u0430"
             }
         ]
     }

@@ -50,11 +50,11 @@ class Builder:
     def get_products_for_output_message(self) -> list[dict[str, Any]]:
         return [
             dict(
-                product_id=self._get_uuid(product["id"]),
+                product_id=str(self._get_uuid(product["id"])),
                 product_name=product["name"],
                 price=product["price"],
                 quantity=product["quantity"],
-                category_id=self._get_uuid(product["category"]),
+                category_id=str(self._get_uuid(product["category"])),
                 category_name=product["category"],
             )
             for product in self.payload.products
