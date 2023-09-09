@@ -3,6 +3,7 @@ from logging import Formatter, Logger, StreamHandler, getLogger
 
 import yaml
 
+
 class LogManager(Logger):
     """Python Logging Manager for project."""
 
@@ -38,9 +39,7 @@ class LogManager(Logger):
             case "localfile":
                 handler = StreamHandler(stream=sys.stdout)
             case _:
-                raise ValueError(
-                    f"Please specify correct handler for logging output"
-                )
+                raise ValueError(f"Please specify correct handler for logging output")
 
         match self.level:
             case "DEBUG":

@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: cr.yandex/crpirqoff1mo9jl1l5pd/stg-collector-app
   pullPolicy: IfNotPresent
-  tag: "v20230826-r1"
+  tag: "v20230909-r1.0"
 
 containerPort: 5000
 

@@ -40,20 +40,7 @@ apps:
           user-names: dds.s_user_names
 
     cdm-collector-app:
-
-  # test:
-  #   stg-collector-app:
-  #     topic-in: *order-service-orders-topic
-  #     topic-out: *stg-processor-output-topic
-  #     target-tables:
-  #       order-events: stg.order_events
-
-  #   dds-collector-app:
-  #     topic-in: *stg-processor-output-topic
-  #     target-tables:
-  #       hubs:
-  #         h_category: h_category
-  #       satelities:
-  #       links:
-
-  #   cdm-collector-app:
+      topic-in: *dds-processor-output-topic
+      target-tables:
+        user_product_counters: cdm.user_product_counters
+        user_category_counters: cdm.user_category_counters

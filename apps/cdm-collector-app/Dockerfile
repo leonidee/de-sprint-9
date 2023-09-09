@@ -18,7 +18,7 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry $(whic
 
 ENV PATH="/opt/poetry/bin:$PATH"
 
-COPY ./apps/stg-collector-app /app/apps/stg-collector-app
+COPY ./apps/cdm-collector-app /app/apps/cdm-collector-app
 COPY ./src /app/src
 COPY ./.env /app/.env
 COPY ./config.yaml /app/config.yaml
@@ -27,7 +27,7 @@ COPY ./poetry.lock /app/poetry.lock
 
 RUN poetry env use $(which python3) \
     && . $(poetry env info --path)/bin/activate \
-    && poetry install --only stg-collector-app
+    && poetry install --only cdm-collector-app
 
 ENTRYPOINT ["/bin/sh", "-c"]
-CMD [". $(poetry env info --path)/bin/activate && python /app/apps/stg-collector-app/run.py"]
+CMD [". $(poetry env info --path)/bin/activate && python /app/apps/cdm-collector-app/run.py"]

@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: cr.yandex/crpirqoff1mo9jl1l5pd/dds-collector-app
+  repository: cr.yandex/crpirqoff1mo9jl1l5pd/cdm-collector-app
   pullPolicy: IfNotPresent
   tag: "v20230909-r1.0"
 

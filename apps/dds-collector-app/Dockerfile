@@ -18,7 +18,13 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry $(whic
 
 ENV PATH="/opt/poetry/bin:$PATH"
 
-COPY . /app
+COPY ./apps/dds-collector-app /app/apps/dds-collector-app
+COPY ./src /app/src
+COPY ./.env /app/.env
+COPY ./config.yaml /app/config.yaml
+COPY ./pyproject.toml /app/pyproject.toml 
+COPY ./poetry.lock /app/poetry.lock
+
 
 RUN poetry env use $(which python3) \
     && . $(poetry env info --path)/bin/activate \

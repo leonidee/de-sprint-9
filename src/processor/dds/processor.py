@@ -118,6 +118,8 @@ class DDSMessageProcessor(MessageProcessor):
                     load_src  =  excluded.load_src;
             """
             )
+            log.debug(f"Inserted {self.config['target-tables']['hubs']['user']}")
+
             h_restaurant = builder.get_h_restaurant()
 
             cur.execute(
@@ -134,6 +136,8 @@ class DDSMessageProcessor(MessageProcessor):
             """
             )
 
+            log.debug(f"Inserted {self.config['target-tables']['hubs']['restaurant']}")
+
             for product in builder.get_h_product():
                 cur.execute(
                     f"""
@@ -149,6 +153,8 @@ class DDSMessageProcessor(MessageProcessor):
                 """
                 )
 
+            log.debug(f"Inserted {self.config['target-tables']['hubs']['product']}")
+
             for category in builder.get_h_category():
                 cur.execute(
                     f"""
@@ -163,6 +169,8 @@ class DDSMessageProcessor(MessageProcessor):
                         load_src    = excluded.load_src;
                 """
                 )
+
+            log.debug(f"Inserted {self.config['target-tables']['hubs']['category']}")
 
             h_order = builder.get_h_order()
 
@@ -180,6 +188,7 @@ class DDSMessageProcessor(MessageProcessor):
                     load_src    = excluded.load_src;
             """
             )
+            log.debug(f"Inserted {self.config['target-tables']['hubs']['order']}")
 
             self.pg.commit()
             cur.close()

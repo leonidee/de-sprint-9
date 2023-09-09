@@ -12,7 +12,6 @@ from src.redis import RedisClient
 
 
 class MessageProcessor(ABC):
-
     def __init__(self) -> None:
         kafka = KafkaClient()
 
@@ -24,22 +23,21 @@ class MessageProcessor(ABC):
         with open("/app/config.yaml") as f:
             config_file = yaml.safe_load(f)
 
-        self.environ = config_file['environ']
+        self.environ = config_file["environ"]
 
         match self.environ:
             case "prod":
-                self.config = config_file['apps']['prod']
+                self.config = config_file["apps"]["prod"]
                 self.pg = PGClient(environ="prod").get_connection()
 
             case "test":
-                self.config = config_file['apps']['test']
+                self.config = config_file["apps"]["test"]
                 self.pg = PGClient(environ="test").get_connection()
 
             case _:
                 raise ValueError(
                     "Specify correct type of environment in config.yaml file. Should be 'prod' or 'test'"
                 )
-
 
     @abstractmethod
     def run(self) -> ...:

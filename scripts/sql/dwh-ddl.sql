@@ -3,7 +3,7 @@ START TRANSACTION;
 DROP TABLE IF EXISTS cdm.user_product_counters;
 CREATE TABLE cdm.user_product_counters
 (
-    id           int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id           uuid         NOT NULL PRIMARY KEY,
     user_id      uuid         NOT NULL,
     product_id   uuid         NOT NULL,
     product_name varchar(100) NOT NULL,
@@ -12,22 +12,17 @@ CREATE TABLE cdm.user_product_counters
     CHECK ( order_cnt >= 0 )
 );
 
-CREATE INDEX ON cdm.user_product_counters (user_id, product_id);
-
 
 DROP TABLE IF EXISTS cdm.user_category_counters;
 CREATE TABLE cdm.user_category_counters
 (
-    id            int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            uuid         NOT NULL PRIMARY KEY,
     user_id       uuid         NOT NULL,
     category_id   uuid         NOT NULL,
     category_name varchar(100) NOT NULL,
-    order_cnt     int          NOT NULL DEFAULT 0,
-
-    CHECK ( order_cnt >= 0 )
+    order_cnt     integer      NOT NULL DEFAULT 0,
+    CHECK (order_cnt >= 0)
 );
-
-CREATE INDEX ON cdm.user_category_counters (user_id, category_id);
 
 
 DROP TABLE IF EXISTS stg.order_events;
