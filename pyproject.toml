@@ -7,11 +7,15 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pgcli = "^3.5.0"
 python-dotenv = "^1.0.0"
 pyyaml = "^6.0.1"
 ipykernel = "^6.25.1"
 pandas = "^2.1.0"
 tabulate = "^0.9.0"
+pydantic = "^2.3.0"
 
 [tool.poetry.group.stg-collector-app.dependencies]
 redis = "^4.6.0"
@@ -19,6 +23,7 @@ python-dotenv = "^1.0.0"
 kafka-python = "^2.0.2"
 psycopg2-binary = "^2.9.7"
 pyyaml = "^6.0.1"
+pydantic = "^2.3.0"
 
 [tool.poetry.group.dds-collector-app.dependencies]
 redis = "^4.6.0"
@@ -26,6 +31,7 @@ python-dotenv = "^1.0.0"
 kafka-python = "^2.0.2"
 psycopg2-binary = "^2.9.7"
 pyyaml = "^6.0.1"
+pydantic = "^2.3.0"
 
 [tool.poetry.group.cdm-collector-app.dependencies]
 redis = "^4.6.0"
@@ -34,7 +40,7 @@ kafka-python = "^2.0.2"
 psycopg2-binary = "^2.9.7"
 pyyaml = "^6.0.1"
 pandas = "2.1.0"
-tabulate = "^0.9.0"
+pydantic = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]

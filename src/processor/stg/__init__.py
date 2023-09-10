@@ -6,6 +6,8 @@ import sys
 from datetime import datetime
 from json.decoder import JSONDecodeError
 
+from pydantic import BaseModel
+
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
 

@@ -38,13 +38,13 @@ class Builder:
 
     def _get_uuid(self, obj: Iterable[Any] | Any) -> uuid.UUID:
         if isinstance(obj, Iterable):
-            obj: str = "".join([str(_) for _ in obj])
+            objs: str = "".join([str(_) for _ in obj])
         else:
-            obj: str = str(obj)
+            objs: str = str(obj)
 
         return uuid.uuid5(
             namespace=uuid.UUID("7f288a2e-0ad0-4039-8e59-6c9838d87307"),
-            name=obj,
+            name=objs,
         )
 
     def get_products_for_output_message(self) -> list[dict[str, Any]]:

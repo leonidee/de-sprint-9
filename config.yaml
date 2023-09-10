@@ -2,24 +2,19 @@ logging:
   level: debug
   handler: console # localfile / console
 
-environ: prod # prod / test
-
-topics:
-  order-service-orders: &order-service-orders-topic order-service_orders # order-app-orders
-  stg-processor-output: &stg-processor-output-topic stg-service-orders # stg-collector-app-orders
-  dds-processor-output: &dds-processor-output-topic dds-collector-app-orders # dds-collector-app-orders
+environ: test # prod / test
 
 apps:
   prod:
-    stg-collector-app:
-      topic-in: *order-service-orders-topic
-      topic-out: *stg-processor-output-topic
+    stg-collector-app: &stg
+      topic-in: order-app-orders
+      topic-out: &stg-processor-output-topic stg-collector-app-orders
       target-tables:
         order-events: stg.order_events
 
-    dds-collector-app:
+    dds-collector-app: &dds
       topic-in: *stg-processor-output-topic
-      topic-out: *dds-processor-output-topic
+      topic-out: &dds-processor-output-topic dds-collector-app-orders
       target-tables:
         hubs:
           user: dds.h_user
@@ -39,8 +34,15 @@ apps:
           restaurant-names: dds.s_restaurant_names
           user-names: dds.s_user_names
 
-    cdm-collector-app:
+    cdm-collector-app: &cdm
       topic-in: *dds-processor-output-topic
       target-tables:
         user_product_counters: cdm.user_product_counters
         user_category_counters: cdm.user_category_counters
+  test:
+    stg-collector-app:
+      <<: *stg
+    dds-collector-app:
+      <<: *dds
+    cdm-collector-app:
+      <<: *cdm

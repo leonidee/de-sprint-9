@@ -19,7 +19,7 @@ class PGClient:
         match self.environ:
             case "prod":
                 properties = dict(
-                    dbname=getenv("YC_POSTGRE_DB"),
+                    dbname=getenv("YC_POSTGRE_PROD_DB"),
                     user=getenv("YC_POSTGRE_USERNAME"),
                     password=getenv("YC_POSTGRE_PASSWORD"),
                     host=getenv("YC_POSTGRE_HOST"),
@@ -29,7 +29,7 @@ class PGClient:
                 )
             case "test":
                 properties = dict(
-                    dbname=getenv("YC_POSTGRE_DB"),
+                    dbname=getenv("YC_POSTGRE_TEST_DB"),
                     user=getenv("YC_POSTGRE_USERNAME"),
                     password=getenv("YC_POSTGRE_PASSWORD"),
                     host=getenv("YC_POSTGRE_HOST"),

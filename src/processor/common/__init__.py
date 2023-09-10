@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 from abc import ABC, abstractmethod
 from datetime import datetime
+from pathlib import Path
 
 import yaml
 
@@ -20,7 +21,7 @@ class MessageProcessor(ABC):
         self.consumer = kafka.get_consumer()
         self.producer = kafka.get_producer()
 
-        with open("/app/config.yaml") as f:
+        with open(Path(__file__).parents[4] / "config.yaml") as f:
             config_file = yaml.safe_load(f)
 
         self.environ = config_file["environ"]

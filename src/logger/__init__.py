@@ -1,5 +1,6 @@
 import sys
 from logging import Formatter, Logger, StreamHandler, getLogger
+from pathlib import Path
 
 import yaml
 
@@ -10,14 +11,14 @@ class LogManager(Logger):
     __slots__ = ("level", "handler")
 
     def __init__(self) -> None:
-        with open("/app/config.yaml") as f:
+        with open(Path(__file__).parents[2] / "config.yaml") as f:
             config = yaml.safe_load(f)
 
         self.level = config["logging"]["level"].upper()
         self.handler = config["logging"]["handler"]
 
     def get_logger(self, name: str) -> Logger:
-        """Returns configured Logger instance.
+        """Gets configured Logger instance.
 
         ## Parameters
         `name` : `str`

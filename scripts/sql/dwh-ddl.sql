@@ -1,4 +1,4 @@
-START TRANSACTION;
+CREATE SCHEMA IF NOT EXISTS cdm;
 
 DROP TABLE IF EXISTS cdm.user_product_counters;
 CREATE TABLE cdm.user_product_counters
@@ -24,6 +24,7 @@ CREATE TABLE cdm.user_category_counters
     CHECK (order_cnt >= 0)
 );
 
+CREATE SCHEMA IF NOT EXISTS stg;
 
 DROP TABLE IF EXISTS stg.order_events;
 CREATE TABLE stg.order_events
@@ -36,6 +37,7 @@ CREATE TABLE stg.order_events
 );
 
 
+CREATE SCHEMA IF NOT EXISTS dds;
 
 DROP TABLE IF EXISTS dds.h_user;
 CREATE TABLE dds.h_user
@@ -209,4 +211,3 @@ CREATE TABLE dds.s_order_status
     FOREIGN KEY (h_order_pk) REFERENCES dds.h_order (h_order_pk)
 );
 
-COMMIT;
