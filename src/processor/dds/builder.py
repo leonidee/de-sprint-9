@@ -60,9 +60,6 @@ class Builder:
             for product in self.payload.products
         ]
 
-    # def format_products(self, products: list[HubProduct]) -> list[dict[str, Any]]:
-    #     return [dataclasses.asdict(product) for product in products]
-
     def get_h_order(self) -> HubOrder:
         return HubOrder(
             h_order_pk=self._get_uuid(obj=self.payload.id),
