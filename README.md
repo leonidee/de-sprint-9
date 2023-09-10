@@ -14,7 +14,15 @@ export KUBECONFIG=$HOME/.kube/config
 ```
 
 ```shell
-source .env && docker build -t cr.yandex/$YC_REGISTRY_ID/stg-collector-app:v20230826-r1.1 -f ./apps/stg-collector-app/Dockerfile .
+source .env
+```
+
+```shell
+export APP_VERSION=v20230826-r1.1
+```
+
+```shell
+docker build -t cr.yandex/$YC_REGISTRY_ID/stg-collector-app:$APP_VERSION -f ./apps/stg-collector-app/Dockerfile .
 ```
 
 ```shell
@@ -24,7 +32,7 @@ docker images | grep "stg-collector-app"
 Push image to registry:
 
 ```shell
-docker push cr.yandex/$YC_REGISTRY_ID/stg-collector-app:v20230826-r1.1
+docker push cr.yandex/$YC_REGISTRY_ID/stg-collector-app:$APP_VERSION
 ```
 
 # Deploy helm chart to kubernetes 
