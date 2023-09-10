@@ -1,7 +1,6 @@
 from os import getenv
 
 import psycopg2
-import yaml
 
 from src.logger import LogManager
 

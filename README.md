@@ -1,6 +1,6 @@
 
 
-# Test apps
+# Test app
 
 ```shell
 docker compose up stg-collector-app --build

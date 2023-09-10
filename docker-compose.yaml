@@ -16,7 +16,6 @@ services:
     container_name: stg-collector-app
     <<: *apps-common
 
-
   dds-collector-app:
     build:
       dockerfile: ./apps/dds-collector-app/Dockerfile
