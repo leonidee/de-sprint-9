@@ -15,32 +15,20 @@ pyyaml = "^6.0.1"
 ipykernel = "^6.25.1"
 pandas = "^2.1.0"
 tabulate = "^0.9.0"
-pydantic = "^2.3.0"
+s3fs = "2023.6.0"
 
-[tool.poetry.group.stg-collector-app.dependencies]
-redis = "^4.6.0"
-python-dotenv = "^1.0.0"
-kafka-python = "^2.0.2"
-psycopg2-binary = "^2.9.7"
-pyyaml = "^6.0.1"
-pydantic = "^2.3.0"
-
-[tool.poetry.group.dds-collector-app.dependencies]
-redis = "^4.6.0"
-python-dotenv = "^1.0.0"
-kafka-python = "^2.0.2"
-psycopg2-binary = "^2.9.7"
-pyyaml = "^6.0.1"
-pydantic = "^2.3.0"
-
-[tool.poetry.group.cdm-collector-app.dependencies]
-redis = "^4.6.0"
-python-dotenv = "^1.0.0"
-kafka-python = "^2.0.2"
-psycopg2-binary = "^2.9.7"
-pyyaml = "^6.0.1"
+[tool.poetry.group.apps-common.dependencies]
 pandas = "2.1.0"
-pydantic = "^2.3.0"
+psycopg2-binary = "^2.9.7"
+python-dotenv = "^1.0.0"
+pyyaml = "^6.0.1"
+kafka-python = "^2.0.2"
+redis = "^4.6.0"
+
+[tool.poetry.group.producer-app.dependencies]
+s3fs = "2023.6.0"
+pyarrow = "12.0.1"
+
 
 [build-system]
 requires = ["poetry-core"]

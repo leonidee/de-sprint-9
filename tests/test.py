@@ -1,3 +1,5 @@
+import dataclasses
+
 from pydantic_core._pydantic_core import ValidationError
 
 
@@ -23,7 +25,15 @@ def main():
     u3 = User(**data)
     print(u3)
 
-    u3.name = "Hello"
+    @dataclasses.dataclass
+    class UserSecond:
+        age: int
+
+    u4 = UserSecond(**data)
+    print(u4.age)
+
+    print(u3.model_dump_json())
+    print(type(u3.model_dump_json()))
 
 
 if __name__ == "__main__":

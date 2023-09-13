@@ -14,7 +14,7 @@ class KafkaClient:
 
     def __init__(self) -> None:
         self.properties = dict(
-            bootstrap_servers=getenv("YC_KAFKA_BOOTSTRAP_SERVERS"),
+            bootstrap_servers=f'{getenv("YC_KAFKA_BOOTSTRAP_SERVER")}:{getenv("YC_KAFKA_BOOTSTRAP_SERVER_PORT")}',
             security_protocol="SASL_SSL",
             sasl_mechanism="SCRAM-SHA-512",
             sasl_plain_username=getenv("YC_KAFKA_USERNAME"),

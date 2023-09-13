@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import dataclasses
 import json
 import sys
+from dataclasses import dataclass
 from datetime import datetime
 from json.decoder import JSONDecodeError
-
-from pydantic import BaseModel
 
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
@@ -14,7 +12,7 @@ from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
 log = LogManager().get_logger(__name__)
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True)
 class OrderEvent:
     object_id: int
     object_type: str

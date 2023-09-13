@@ -154,7 +154,7 @@ curl -X POST https://order-gen-service.sprint9.tgcloudenv.ru/register_kafka \
     "student": "leonidgrishenkov@yandex.ru",
     "kafka_connect":{
         "host": "${YC_KAFKA_BOOTSTRAP_SERVERS}",
-        "port": 9091,
+        "port": ${YC_KAFKA_BOOTSTRAP_SERVER_PORT},
         "topic": "order-app-orders",
         "producer_name": "${YC_KAFKA_USERNAME}",
         "producer_password": "{$YC_KAFKA_PASSWORD}"

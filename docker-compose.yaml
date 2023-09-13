@@ -27,3 +27,9 @@ services:
       dockerfile: ./apps/cdm-collector-app/Dockerfile
     container_name: cdm-collector-app
     <<: *apps-common
+
+  producer-app:
+    build:
+      dockerfile: ./apps/producer-app/Dockerfile
+    container_name: producer-app
+    <<: *apps-common

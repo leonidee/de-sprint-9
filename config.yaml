@@ -6,8 +6,12 @@ environ: test # prod / test
 
 apps:
   prod:
+    producer-app:
+      input-data-path: s3a://data-ice-lake-05/master/data/source/order-app
+      topic-out: &order-app-ouput-topic order-app-orders
+
     stg-collector-app: &stg
-      topic-in: order-app-orders
+      topic-in: *order-app-ouput-topic
       topic-out: &stg-processor-output-topic stg-collector-app-orders
       target-tables:
         order-events: stg.order_events
@@ -39,6 +43,7 @@ apps:
       target-tables:
         user_product_counters: cdm.user_product_counters
         user_category_counters: cdm.user_category_counters
+
   test:
     stg-collector-app:
       <<: *stg
