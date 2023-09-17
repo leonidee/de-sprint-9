@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import itertools
 import json
-import sys
-from dataclasses import dataclass
+import time
 from datetime import datetime
 from json.decoder import JSONDecodeError
+
+import psycopg
+from pydantic import BaseModel, ValidationError, field_validator
 
 from src.logger import LogManager
 from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
@@ -12,12 +15,17 @@ from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
 log = LogManager().get_logger(__name__)
 
 
-@dataclass(slots=True, frozen=True)
-class OrderEvent:
+class Value(BaseModel):
     object_id: int
     object_type: str
-    sent_dttm: datetime
+    send_dttm: datetime
     payload: dict
+
+    @field_validator("object_type")
+    @classmethod
+    def validate_object_type(cls, value) -> ...:
+        if value != "order":
+            raise ValueError("Only order as object_type are allowed")
 
 
 class STGMessageProcessor(MessageProcessor):
@@ -28,6 +36,9 @@ class STGMessageProcessor(MessageProcessor):
         "redis",
         "config",
         "environ",
+        "batch_size",
+        "delay",
+        "timeout",
     )
 
     def __init__(self) -> None:
@@ -35,90 +46,86 @@ class STGMessageProcessor(MessageProcessor):
 
         self.config = self.config["stg-collector-app"]
 
-    def run(self) -> ...:
+    def run_processor(self) -> ...:
         log.info("Running stg layer message processor")
 
         self.consumer.subscribe(self.config["topic-in"])
         log.info(f"Subscribed to {self.config['topic-in']}")
 
-        log.info(f"Will send output messages to -> {self.config['topic-out']} topic")
+        log.info(f"Will send output messages to {self.config['topic-out']} topic")
 
-        log.info("Processing messages...")
-        for message in self.consumer:
-            log.info(
-                f"Processing -> Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}"
+        counter = itertools.count(1)
+
+        while True:
+            start = datetime.now()
+            current_batch = next(counter)
+            log.info(f"Processing {current_batch} batch")
+
+            pack = self.consumer.poll(
+                timeout_ms=self.timeout, max_records=self.batch_size
             )
-            try:
-                value: dict = json.loads(message.value)
-            except JSONDecodeError:
-                log.warning(f"Unable to decode {message.offset} offset. Skipping")
-                continue
 
-            if all(
-                key in value
-                for key in ("object_id", "object_type", "sent_dttm", "payload")
-            ):  # Workaround for unexpected format messages
-                if (
-                    value["object_type"] == "order"
-                ):  # In this step we need only 'order' messages
-                    self._insert_order_event_row(message=self._get_order_event(value))
+            cur = self.pg.cursor()
 
-                    self.producer.send(
-                        topic=self.config["topic-out"],
-                        value=json.dumps(
-                            dataclasses.asdict(self._get_output_message(value))
-                        ).encode("utf-8"),
+            for _, messages in pack.items():
+                for message in messages:
+                    log.debug(
+                        f"Processing -> Offset: {message.offset} Partition: {message.partition} Timestamp: {message.timestamp}"
                     )
-                else:
-                    continue
-            else:
-                continue
+                    try:
+                        value: dict = json.loads(message.value)
+                    except JSONDecodeError:
+                        log.warning(f"Unable to decode {message.offset} offset")
+                        continue
 
-    def _insert_order_event_row(self, message: OrderEvent) -> ...:
-        cur = self.pg.cursor()
+                    try:
+                        value = Value(**value)
+                    except ValidationError as err:
+                        if "missing" or "value_error" in err.errors()[0]["type"]:
+                            log.warning(err)
+                        else:
+                            log.error(err)
+                        continue
 
-        try:
-            log.debug(f"Inserting order event row: {message}")
+                    try:
+                        self._insert_order_event_row(value, cur)
+                    except Exception as err:
+                        log.error(err)
+                        self.pg.rollback()
+                        cur.close()
+                    else:
+                        self.pg.commit()
 
-            cur.execute(
-                f""" 
-                INSERT INTO
-                        {self.config["target-tables"]["order-events"]} (object_id, object_type, sent_dttm, payload)
-                    VALUES
-                        ('{message.object_id}', '{message.object_type}', '{message.sent_dttm}', '{message.payload}')
-                    ON CONFLICT (object_id) DO UPDATE
-                        SET
-                            object_type = excluded.object_type,
-                            sent_dttm  = excluded.sent_dttm,
-                            payload    = excluded.payload;
-
-                """
-            )
-            self.pg.commit()
-
-        except Exception as err:
-            log.exception(err)
-            self.pg.rollback()
-
+            # self.producer.send(
+            #     topic=self.config["topic-out"],
+            #     value=json.dumps(
+            #         dataclasses.asdict(self._get_output_message(value))
+            #     ).encode("utf-8"),
+            # )
             cur.close()
-            self.pg.close()
 
-            sys.exit(1)
+            log.info(f"{current_batch} batch processed in {datetime.now() - start}")
 
-    def _get_order_event(self, value: dict) -> OrderEvent:
-        object_id = int(value["object_id"])
-        object_type = str(value["object_type"])
-        payload = value["payload"]
+            log.info("Waiting for new batch")
+            time.sleep(self.delay)
 
-        order_event = OrderEvent(
-            object_id=object_id,
-            object_type=object_type,
-            sent_dttm=value["sent_dttm"],
-            payload=json.dumps(payload),
+    def _insert_order_event_row(self, value: Value, cur: psycopg.Cursor) -> ...:
+        log.debug(f"{value=}")
+
+        cur.execute(
+            f""" 
+            INSERT INTO
+                    {self.config["target-tables"]["order-events"]} (object_id, object_type, sent_dttm, payload)
+                VALUES
+                    ('{value.object_id}', '{value.object_type}', '{value.sent_dttm}', '{json.dumps(value.payload).encode("utf-8")}')
+                ON CONFLICT (object_id) DO UPDATE
+                    SET
+                        object_type = excluded.object_type,
+                        sent_dttm  = excluded.sent_dttm,
+                        payload    = excluded.payload;
+
+            """
         )
-        log.debug(f"Got order event: {order_event}")
-
-        return order_event
 
     def _get_output_message(self, value: dict) -> STGAppOutputMessage:
         def get_category_name(restaurant_id: str, product_id: str) -> str | None:
@@ -166,6 +173,23 @@ class STGMessageProcessor(MessageProcessor):
             ),
         )
 
-        log.debug(f"Got output message: {message}")
+        log.debug(f"{message=}")
 
         return message
+
+
+class Payload(BaseModel):
+    id: int
+    date: datetime
+    cost: float
+    payment: float
+    status: str
+    restaurant: dict
+    user: dict
+    products: list
+
+
+class STGAppMessage(BaseModel):
+    object_id: int
+    object_type: str
+    payload: Payload

@@ -1,6 +1,6 @@
 from os import getenv
 
-import psycopg2
+import psycopg
 
 from src.logger import LogManager
 
@@ -13,7 +13,7 @@ class PGClient:
     def __init__(self, environ: str) -> None:
         self.environ = environ
 
-    def get_connection(self):
+    def get_connection(self) -> psycopg.Connection:
         log.debug("Connecting to PostgreSQL")
 
         match self.environ:
@@ -38,4 +38,4 @@ class PGClient:
                     sslrootcert=getenv("CERTIFICATE_PATH"),
                 )
 
-        return psycopg2.connect(**properties)  # type: ignore
+        return psycopg.connect(**properties)  # type: ignore

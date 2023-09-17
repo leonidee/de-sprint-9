@@ -49,7 +49,7 @@ class DataProducer:
 
         generator = self._read_generator(*path)
 
-        log.debug("Sending messages")
+        log.info("Sending messages")
         while True:
             try:
                 message: dict = next(generator)

@@ -1,9 +1,3 @@
-logging:
-  level: debug
-  handler: console # localfile / console
-
-environ: test # prod / test
-
 apps:
   prod:
     producer-app:

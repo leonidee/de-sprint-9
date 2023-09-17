@@ -9,7 +9,7 @@ log = LogManager().get_logger(__name__)
 
 def main() -> ...:
     proc = STGMessageProcessor()
-    proc.run()
+    proc.run_processor()
 
     proc.pg.close()
 

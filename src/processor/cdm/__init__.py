@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import json
 import sys
 import time
@@ -37,10 +38,12 @@ class CDMMessageProcessor(MessageProcessor):
 
         self.consumer.subscribe(self.config["topic-in"])
 
-        batch = 1
+        counter = itertools.count(1)
+
         while True:
             start = datetime.now()
-            log.info(f"Processing {batch} batch")
+            current_batch = next(counter)
+            log.info(f"Processing {current_batch} batch")
 
             pack = self.consumer.poll(timeout_ms=5000, max_records=batch_size)
 
@@ -80,11 +83,10 @@ class CDMMessageProcessor(MessageProcessor):
 
             self.insert_to_postgres(frame=DataFrame(queue))
 
-            log.info(f"{batch} batch processed in {datetime.now() - start}")
+            log.info(f"{current_batch} batch processed in {datetime.now() - start}")
 
             log.info("Waiting for new batch")
             time.sleep(delay)
-            batch += 1
 
     def insert_to_postgres(self, frame: DataFrame) -> ...:
         cur = self.pg.cursor()

@@ -1,8 +1,6 @@
 import sys
 from logging import Formatter, Logger, StreamHandler, getLogger
-from pathlib import Path
-
-import yaml
+from os import getenv
 
 
 class LogManager(Logger):
@@ -11,11 +9,17 @@ class LogManager(Logger):
     __slots__ = ("level", "handler")
 
     def __init__(self) -> None:
-        with open(Path(__file__).parents[2] / "config.yaml") as f:
-            config = yaml.safe_load(f)
+        self.level: str = getenv("LOGGING_LEVEL")
+        self.handler: str = getenv("LOGGING_HANDLER")
 
-        self.level = config["logging"]["level"].upper()
-        self.handler = config["logging"]["handler"]
+        if not self.level:
+            raise ValueError(
+                "Specify level for logger object as LOGGING_LEVEL variable"
+            )
+        if not self.handler:
+            raise ValueError(
+                "Specify handler for logger object as LOGGING_HANDLER variable"
+            )
 
     def get_logger(self, name: str) -> Logger:
         """Gets configured Logger instance.
@@ -29,23 +33,25 @@ class LogManager(Logger):
         """
         logger = getLogger(name=name)
 
-        logger.setLevel(level=self.level)
+        logger.setLevel(level=self.level.strip().upper())
 
         if logger.hasHandlers():
             logger.handlers.clear()
 
-        match self.handler:
+        match self.handler.strip().lower():
             case "console":
                 handler = StreamHandler(stream=sys.stdout)
             case "localfile":
                 handler = StreamHandler(stream=sys.stdout)
             case _:
-                raise ValueError(f"Please specify correct handler for logging output")
+                raise ValueError(
+                    "Please specify correct handler for logging object as LOGGING_HANDLER variable"
+                )
 
-        match self.level:
-            case "DEBUG":
+        match self.level.strip().lower():
+            case "debug":
                 message_format = r"[%(asctime)s] {%(name)s.%(funcName)s:%(lineno)d} %(levelname)s: %(message)s"
-            case "INFO":
+            case "info":
                 message_format = (
                     r"[%(asctime)s] {%(name)s.%(lineno)d} %(levelname)s: %(message)s"
                 )

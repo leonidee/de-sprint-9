@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 from abc import ABC, abstractmethod
 from datetime import datetime
+from os import getenv
 from pathlib import Path
 
 import yaml
@@ -24,9 +25,12 @@ class MessageProcessor(ABC):
         with open(Path(__file__).parents[4] / "config.yaml") as f:
             config_file = yaml.safe_load(f)
 
-        self.environ = config_file["environ"]
+        self.environ = getenv("ENVIRON")
 
-        match self.environ:
+        if not self.environ:
+            raise ValueError("Set type of environment as ENVIRON variable")
+
+        match self.environ.strip().lower():
             case "prod":
                 self.config = config_file["apps"]["prod"]
                 self.pg = PGClient(environ="prod").get_connection()
@@ -37,11 +41,15 @@ class MessageProcessor(ABC):
 
             case _:
                 raise ValueError(
-                    "Specify correct type of environment in config.yaml file. Should be 'prod' or 'test'"
+                    "Specify correct type of environment as ENVIRON variable. Should be 'prod' or 'test'"
                 )
 
+        self.batch_size: int = 50
+        self.delay: int = 30
+        self.timeout: int = 5_000
+
     @abstractmethod
-    def run(self) -> ...:
+    def run_processor(self) -> ...:
         ...
 
 

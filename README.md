@@ -1,17 +1,16 @@
 
 
-# Test app
+# Apps
+
+## Test app
 
 ```shell
 docker compose up stg-collector-app --build
 ```
 
 
-# Build image and push to registry
+## Build image and push to registry
 
-```shell
-export KUBECONFIG=$HOME/.kube/config
-```
 
 ```shell
 source .env
@@ -35,7 +34,13 @@ Push image to registry:
 docker push cr.yandex/$YC_REGISTRY_ID/stg-collector-app:$APP_VERSION
 ```
 
-# Deploy helm chart to kubernetes 
+## Deploy helm chart to kubernetes cluster
+
+Prepare k8s config file and add path to environment variable:
+
+```shell
+export KUBECONFIG=$HOME/.kube/config
+```
 
 ```shell
 cd /apps/stg-collector-app/helm
@@ -144,22 +149,5 @@ yc managed-kafka user create $YC_KAFKA_USERNAME \
 ```
 
 
-Register kafka cluster in Yandex Practicum API for write data to it:
 
-```shell
-curl -X POST https://order-gen-service.sprint9.tgcloudenv.ru/register_kafka \
--H 'Content-Type: application/json; charset=utf-8' \
---data-binary @- << EOF
-{
-    "student": "leonidgrishenkov@yandex.ru",
-    "kafka_connect":{
-        "host": "${YC_KAFKA_BOOTSTRAP_SERVERS}",
-        "port": ${YC_KAFKA_BOOTSTRAP_SERVER_PORT},
-        "topic": "order-app-orders",
-        "producer_name": "${YC_KAFKA_USERNAME}",
-        "producer_password": "{$YC_KAFKA_PASSWORD}"
-    }
-}
-EOF
-```
 
