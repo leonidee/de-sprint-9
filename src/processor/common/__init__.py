@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import dataclasses
 from abc import ABC, abstractmethod
-from datetime import datetime
 from os import getenv
 from pathlib import Path
 
@@ -22,7 +20,7 @@ class MessageProcessor(ABC):
         self.consumer = kafka.get_consumer()
         self.producer = kafka.get_producer()
 
-        with open(Path(__file__).parents[4] / "config.yaml") as f:
+        with open(Path(__file__).parents[3] / "config.yaml") as f:
             config_file = yaml.safe_load(f)
 
         self.environ = getenv("ENVIRON")
@@ -44,29 +42,10 @@ class MessageProcessor(ABC):
                     "Specify correct type of environment as ENVIRON variable. Should be 'prod' or 'test'"
                 )
 
-        self.batch_size: int = 50
-        self.delay: int = 30
-        self.timeout: int = 5_000
+        self.batch_size: int = int(getenv("PROCESSOR_BATCH_SIZE"))
+        self.delay: int = int(getenv("PROCESSOR_DELAY"))
+        self.timeout: int = int(getenv("PROCESSOR_TIMEOUT"))
 
     @abstractmethod
     def run_processor(self) -> ...:
         ...
-
-
-@dataclasses.dataclass(slots=True, frozen=True)
-class STGAppOutputMessage:
-    object_id: int
-    object_type: str
-    payload: Payload
-
-
-@dataclasses.dataclass(slots=True, frozen=True)
-class Payload:
-    id: int
-    date: datetime
-    cost: float
-    payment: float
-    status: str
-    restaurant: dict
-    user: dict
-    products: list

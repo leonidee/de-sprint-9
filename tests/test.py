@@ -1,4 +1,6 @@
 import dataclasses
+import json
+from datetime import datetime
 
 from pydantic_core._pydantic_core import ValidationError
 
@@ -11,29 +13,25 @@ def main():
 
     from pydantic import BaseModel, Field
 
+    class NestedField(BaseModel):
+        value: str
+        arr: list
+        dt: datetime
+
     class User(BaseModel):
         age: int = Field(frozen=True, gt=1, lt=10)
+        nested: NestedField
 
-    u1 = User(age=8)
-    try:
-        u2 = User(age=15)
-    except ValidationError as err:
-        print(err)
+    u = User(
+        age=8,
+        nested=NestedField(
+            value="some value", arr=[1, 2, 3, 4], dt=datetime(1993, 1, 1)
+        ),
+    )
 
-    data = {"age": 5}
-
-    u3 = User(**data)
-    print(u3)
-
-    @dataclasses.dataclass
-    class UserSecond:
-        age: int
-
-    u4 = UserSecond(**data)
-    print(u4.age)
-
-    print(u3.model_dump_json())
-    print(type(u3.model_dump_json()))
+    u = u.model_dump_json(indent=2)
+    print(type(u))
+    print(u)
 
 
 if __name__ == "__main__":

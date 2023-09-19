@@ -1,7 +1,8 @@
 import time
 from os import getenv
 
-import kafka
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.errors import NoBrokersAvailable
 from src.logger import LogManager
 
 log = LogManager().get_logger(name=__name__)
@@ -22,13 +23,17 @@ class KafkaClient:
             ssl_cafile=getenv("CERTIFICATE_PATH"),
         )
 
-    def get_producer(self) -> kafka.KafkaProducer:
+    def get_producer(self) -> KafkaProducer:
         log.debug("Connecting to Kafka cluster in producer mode")
 
         for i in range(1, 10 + 1):
             try:
-                return kafka.KafkaProducer(**self.properties)
-            except kafka.errors.NoBrokersAvailable as err:
+                producer = KafkaProducer(**self.properties)
+
+                assert producer.bootstrap_connected(), "Not connected!"
+                return producer
+
+            except NoBrokersAvailable as err:
                 if i == 10:
                     raise err
                 else:
@@ -37,16 +42,19 @@ class KafkaClient:
 
                     continue
 
-    def get_consumer(self) -> kafka.KafkaConsumer:
+    def get_consumer(self) -> KafkaConsumer:
         log.debug("Connecting to Kafka cluster in consumer mode")
 
         for i in range(1, 10 + 1):
             try:
-                return kafka.KafkaConsumer(
-                    **self.properties,
-                    auto_offset_reset="earliest",  # earliest / latest
+                consumer = KafkaConsumer(
+                    **self.properties, auto_offset_reset="earliest"
                 )
-            except kafka.errors.NoBrokersAvailable as err:
+
+                assert consumer.bootstrap_connected(), "Not connected!"
+                return consumer
+
+            except NoBrokersAvailable as err:
                 if i == 10:
                     raise err
                 else:

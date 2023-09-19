@@ -24,6 +24,7 @@ class RedisClient:
             ssl_ca_certs=getenv("CERTIFICATE_PATH"),
             ssl=True,
         )
+        self.client.ping()
 
     def set(self, key: str, value: Dict[Any, Any] | Any) -> ...:
         for i in range(1, 10 + 1):
@@ -38,10 +39,10 @@ class RedisClient:
 
                     continue
 
-        log.debug(f"Successfully set '{key}' key")
+        log.debug(f"Successfully set {key} key")
 
-    def get(self, key: str) -> Dict[Any, Any]:
-        log.debug(f"Getting '{key}' key")
+    def get(self, key: str) -> Dict[Any, Any] | None:
+        log.debug(f"Getting {key} key")
 
         for i in range(1, 10 + 1):
             try:
@@ -58,4 +59,8 @@ class RedisClient:
         if not result:
             raise KeyError(f"No such key -> '{key}'")
         else:
-            return json.loads(result.decode())
+            try:
+                return json.loads(result.decode())
+            except json.JSONDecodeError as err:
+                log.warning(f"Unable to decode {key} key value")
+                return None

@@ -59,10 +59,13 @@ source .env && docker build -t cr.yandex/$YC_REGISTRY_ID/stg-collector-app:v2023
 source .env && docker build -t cr.yandex/$YC_REGISTRY_ID/dds-collector-app:v20230909-r1.0 -f ./apps/dds-collector-app/Dockerfile .
 source .env && docker build -t cr.yandex/$YC_REGISTRY_ID/cdm-collector-app:v20230909-r1.0 -f ./apps/cdm-collector-app/Dockerfile .
 
-
 docker push cr.yandex/$YC_REGISTRY_ID/cdm-collector-app:v20230909-r1.0
 
 helm upgrade --install --atomic cdm-collector-app . -n c12-leonid-grishenkov 
+```
+
+```shell
+docker build -t mongodb:v0.1 -f ./apps/mongodb/Dockerfile .
 ```
 
 # Services
@@ -70,36 +73,35 @@ helm upgrade --install --atomic cdm-collector-app . -n c12-leonid-grishenkov
 ## Postgresql
 
 ```shell
-source .env
+docker compose up postgres
 ```
 
-Create user:
+Connect to cluster with `pgcli`:
 
 ```shell
-yc managed-postgresql user create $YC_POSTGRE_USERNAME \
-    --cluster-name $YC_POSTGRE_NAME \
-    --password $YC_POSTGRE_PASSWORD \
-    --conn-limit 20 \
-    --default-transaction-isolation transaction-isolation-read-uncommitted
+pgcli -h localhost -U postgres  -p 5432 
 ```
 
-Create test and prod databases:
+Create databases for test and prod environment:
 
 ```shell
-yc managed-postgresql database create $YC_POSTGRE_TEST_DB \
-    --cluster-name $YC_POSTGRE_NAME \
-    --owner $YC_POSTGRE_USERNAME
+create database test;
 
-
-yc managed-postgresql database create $YC_POSTGRE_PROD_DB \
-    --cluster-name $YC_POSTGRE_NAME \
-    --owner $YC_POSTGRE_USERNAME
+create database prod;
 ```
 
-Connect to test database with `pgcli`:
+Grant all priviliges to main user:
 
 ```shell
-pgcli -h $YC_POSTGRE_HOST -U $YC_POSTGRE_USERNAME -d $YC_POSTGRE_TEST_DB  -p $YC_POSTGRE_PORT
+grant all privileges on database test to de_etl;
+
+grant all privileges on database prod to de_etl;
+```
+
+Reconnect with main user:
+
+```shell
+pgcli -h localhost -U de_etl -d test -p 5432 
 ```
 
 And execute DWH DDL:
@@ -107,6 +109,7 @@ And execute DWH DDL:
 ```shell
 \i scripts/sql/dwh-ddl.sql 
 ```
+
 
 ## Kafka 
 

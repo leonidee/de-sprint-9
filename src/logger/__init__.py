@@ -33,8 +33,6 @@ class LogManager(Logger):
         """
         logger = getLogger(name=name)
 
-        logger.setLevel(level=self.level.strip().upper())
-
         if logger.hasHandlers():
             logger.handlers.clear()
 
@@ -49,14 +47,20 @@ class LogManager(Logger):
                 )
 
         match self.level.strip().lower():
-            case "debug":
+            case "debug" | "info" | "notset":
                 message_format = r"[%(asctime)s] {%(name)s.%(funcName)s:%(lineno)d} %(levelname)s: %(message)s"
-            case "info":
+            case "warning" | "error":
                 message_format = (
                     r"[%(asctime)s] {%(name)s.%(lineno)d} %(levelname)s: %(message)s"
                 )
-            case _:
+            case "critical":
                 message_format = r"[%(asctime)s] {%(name)s} %(levelname)s: %(message)s"
+            case _:
+                raise ValueError(
+                    "Please specify correct level for logging object as LOGGING_LEVEL variable"
+                )
+
+        logger.setLevel(level=self.level.strip().upper())
 
         handler.setFormatter(
             fmt=Formatter(

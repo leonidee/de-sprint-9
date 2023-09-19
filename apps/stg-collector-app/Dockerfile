@@ -27,7 +27,7 @@ COPY ./poetry.lock /app/poetry.lock
 
 RUN poetry env use $(which python3) \
     && . $(poetry env info --path)/bin/activate \
-    && poetry install --only stg-collector-app
+    && poetry install --only apps-common
 
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD [". $(poetry env info --path)/bin/activate && python /app/apps/stg-collector-app/run.py"]

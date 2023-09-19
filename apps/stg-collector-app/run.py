@@ -12,6 +12,8 @@ def main() -> ...:
     proc.run_processor()
 
     proc.pg.close()
+    proc.consumer.close()
+    proc.producer.close()
 
 
 if __name__ == "__main__":

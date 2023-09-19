@@ -10,22 +10,40 @@ import psycopg
 from pydantic import BaseModel, ValidationError, field_validator
 
 from src.logger import LogManager
-from src.processor.common import MessageProcessor, Payload, STGAppOutputMessage
+from src.processor.common import MessageProcessor
 
 log = LogManager().get_logger(__name__)
 
 
 class Value(BaseModel):
     object_id: int
+    payload: str
     object_type: str
-    send_dttm: datetime
-    payload: dict
+    sent_dttm: datetime
 
     @field_validator("object_type")
     @classmethod
-    def validate_object_type(cls, value) -> ...:
+    def validate_object_type(cls, value) -> str:
         if value != "order":
             raise ValueError("Only order as object_type are allowed")
+        return value
+
+
+class Payload(BaseModel):
+    id: int
+    date: datetime
+    cost: float
+    payment: float
+    status: str
+    restaurant: dict
+    user: dict
+    products: list
+
+
+class STGAppMessage(BaseModel):
+    object_id: int
+    object_type: str
+    payload: Payload
 
 
 class STGMessageProcessor(MessageProcessor):
@@ -50,8 +68,8 @@ class STGMessageProcessor(MessageProcessor):
         log.info("Running stg layer message processor")
 
         self.consumer.subscribe(self.config["topic-in"])
-        log.info(f"Subscribed to {self.config['topic-in']}")
 
+        log.info(f"Subscribed to {self.config['topic-in']}")
         log.info(f"Will send output messages to {self.config['topic-out']} topic")
 
         counter = itertools.count(1)
@@ -74,18 +92,18 @@ class STGMessageProcessor(MessageProcessor):
                     )
                     try:
                         value: dict = json.loads(message.value)
+                        value = Value(**value)
                     except JSONDecodeError:
                         log.warning(f"Unable to decode {message.offset} offset")
                         continue
-
-                    try:
-                        value = Value(**value)
                     except ValidationError as err:
                         if "missing" or "value_error" in err.errors()[0]["type"]:
                             log.warning(err)
                         else:
                             log.error(err)
                         continue
+
+                    log.debug(f"{value=}")
 
                     try:
                         self._insert_order_event_row(value, cur)
@@ -96,12 +114,10 @@ class STGMessageProcessor(MessageProcessor):
                     else:
                         self.pg.commit()
 
-            # self.producer.send(
-            #     topic=self.config["topic-out"],
-            #     value=json.dumps(
-            #         dataclasses.asdict(self._get_output_message(value))
-            #     ).encode("utf-8"),
-            # )
+                    message = self._get_output_message(value).model_dump_json().encode()
+
+                    self.producer.send(topic=self.config["topic-out"], value=message)
+
             cur.close()
 
             log.info(f"{current_batch} batch processed in {datetime.now() - start}")
@@ -110,14 +126,12 @@ class STGMessageProcessor(MessageProcessor):
             time.sleep(self.delay)
 
     def _insert_order_event_row(self, value: Value, cur: psycopg.Cursor) -> ...:
-        log.debug(f"{value=}")
-
         cur.execute(
             f""" 
             INSERT INTO
                     {self.config["target-tables"]["order-events"]} (object_id, object_type, sent_dttm, payload)
                 VALUES
-                    ('{value.object_id}', '{value.object_type}', '{value.sent_dttm}', '{json.dumps(value.payload).encode("utf-8")}')
+                    ('{value.object_id}', '{value.object_type}', '{value.sent_dttm}', '{value.payload}')
                 ON CONFLICT (object_id) DO UPDATE
                     SET
                         object_type = excluded.object_type,
@@ -127,7 +141,7 @@ class STGMessageProcessor(MessageProcessor):
             """
         )
 
-    def _get_output_message(self, value: dict) -> STGAppOutputMessage:
+    def _get_output_message(self, value: Value) -> STGAppMessage:
         def get_category_name(restaurant_id: str, product_id: str) -> str | None:
             menu = self.redis.get(key=restaurant_id)["menu"]
 
@@ -135,28 +149,13 @@ class STGMessageProcessor(MessageProcessor):
                 if product["_id"] == product_id:
                     return product["category"]
 
-        object_id = int(value["object_id"])
-        object_type = str(value["object_type"])
-        payload = value["payload"]
+        payload = json.loads(value.payload)
 
-        products = []
-
-        for product in payload["order_items"]:
-            d = dict(
-                id=product["id"],
-                name=product["name"],
-                price=product["price"],
-                quantity=product["quantity"],
-                category=get_category_name(payload["restaurant"]["id"], product["id"]),
-            )
-
-            products.append(d)
-
-        message = STGAppOutputMessage(
-            object_id=object_id,
-            object_type=object_type,
+        return STGAppMessage(
+            object_id=value.object_id,
+            object_type=value.object_type,
             payload=Payload(
-                id=object_id,
+                id=value.object_id,
                 date=payload["date"],
                 cost=payload["cost"],
                 payment=payload["payment"],
@@ -169,27 +168,17 @@ class STGMessageProcessor(MessageProcessor):
                     id=payload["user"]["id"],
                     name=self.redis.get(payload["user"]["id"])["name"],
                 ),
-                products=products,
+                products=[
+                    dict(
+                        id=product["id"],
+                        name=product["name"],
+                        price=product["price"],
+                        quantity=product["quantity"],
+                        category=get_category_name(
+                            payload["restaurant"]["id"], product["id"]
+                        ),
+                    )
+                    for product in payload["order_items"]
+                ],
             ),
         )
-
-        log.debug(f"{message=}")
-
-        return message
-
-
-class Payload(BaseModel):
-    id: int
-    date: datetime
-    cost: float
-    payment: float
-    status: str
-    restaurant: dict
-    user: dict
-    products: list
-
-
-class STGAppMessage(BaseModel):
-    object_id: int
-    object_type: str
-    payload: Payload

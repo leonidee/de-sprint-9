@@ -14,28 +14,28 @@ class PGClient:
         self.environ = environ
 
     def get_connection(self) -> psycopg.Connection:
-        log.debug("Connecting to PostgreSQL")
-
         match self.environ:
             case "prod":
                 properties = dict(
-                    dbname=getenv("YC_POSTGRE_PROD_DB"),
-                    user=getenv("YC_POSTGRE_USERNAME"),
-                    password=getenv("YC_POSTGRE_PASSWORD"),
-                    host=getenv("YC_POSTGRE_HOST"),
-                    port=getenv("YC_POSTGRE_PORT"),
-                    sslmode="verify-full",
-                    sslrootcert=getenv("CERTIFICATE_PATH"),
+                    dbname=getenv("POSTGRESQL_PROD_DB"),
+                    user=getenv("POSTGRESQL_USERNAME"),
+                    password=getenv("POSTGRESQL_PASSWORD"),
+                    host=getenv("POSTGRESQL_HOST"),
+                    port=getenv("POSTGRESQL_PORT"),
+                )
+                log.debug(
+                    f"Connecting to PostgreSQL {getenv('POSTGRESQL_PROD_DB')} database"
                 )
             case "test":
                 properties = dict(
-                    dbname=getenv("YC_POSTGRE_TEST_DB"),
-                    user=getenv("YC_POSTGRE_USERNAME"),
-                    password=getenv("YC_POSTGRE_PASSWORD"),
-                    host=getenv("YC_POSTGRE_HOST"),
-                    port=getenv("YC_POSTGRE_PORT"),
-                    sslmode="verify-full",
-                    sslrootcert=getenv("CERTIFICATE_PATH"),
+                    dbname=getenv("POSTGRESQL_TEST_DB"),
+                    user=getenv("POSTGRESQL_USERNAME"),
+                    password=getenv("POSTGRESQL_PASSWORD"),
+                    host=getenv("POSTGRESQL_HOST"),
+                    port=getenv("POSTGRESQL_PORT"),
+                )
+                log.debug(
+                    f"Connecting to PostgreSQL {getenv('POSTGRESQL_TEST_DB')} database"
                 )
 
         return psycopg.connect(**properties)  # type: ignore

@@ -33,3 +33,21 @@ services:
       dockerfile: ./apps/producer-app/Dockerfile
     container_name: producer-app
     <<: *apps-common
+
+  mongodb: # https://github.com/bitnami/containers/tree/main/bitnami/mongodb
+    image: bitnami/mongodb:5.0.21-debian-11-r5
+    ports:
+      - 27017:27017
+    env_file: 
+      - .env
+    container_name: mongodb
+    <<: *apps-common
+
+  postgres: # https://github.com/bitnami/containers/blob/main/bitnami/postgresql
+    image: bitnami/postgresql:15.4.0-debian-11-r38
+    ports:
+      - 5432:5432
+    env_file: 
+      - .env
+    container_name: postgres
+    <<: *apps-common
