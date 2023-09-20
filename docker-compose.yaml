@@ -49,5 +49,8 @@ services:
       - 5432:5432
     env_file: 
       - .env
+    volumes:
+      - ./scripts/sql/:/opt/scripts
+    
     container_name: postgres
     <<: *apps-common

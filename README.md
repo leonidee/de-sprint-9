@@ -73,13 +73,11 @@ docker build -t mongodb:v0.1 -f ./apps/mongodb/Dockerfile .
 ## Postgresql
 
 ```shell
-docker compose up postgres
+docker compose up -d postgres
 ```
 
-Connect to cluster with `pgcli`:
-
 ```shell
-pgcli -h localhost -U postgres  -p 5432 
+docker exec -it postgres psql -U postgres
 ```
 
 Create databases for test and prod environment:
@@ -98,18 +96,38 @@ grant all privileges on database test to de_etl;
 grant all privileges on database prod to de_etl;
 ```
 
-Reconnect with main user:
+```shell
+\c test
+```
+Execute DWH DDL:
 
 ```shell
-pgcli -h localhost -U de_etl -d test -p 5432 
+\i /opt/scripts/dwh-ddl.sql 
 ```
 
-And execute DWH DDL:
+## Mongodb
 
 ```shell
-\i scripts/sql/dwh-ddl.sql 
+docker compose up -d mongodb
 ```
 
+```shell
+docker exec -it mongodb mongo -u $MONGODB_ROOT_USER -p $MONGODB_ROOT_PASSWORD
+```
+
+```js
+use prod;
+```
+
+Create main user:
+
+```js
+db.createUser({
+    user: 'de_etl',
+    pwd: "lkadmfowiGSi3901GGkas",
+    roles: [{ role: 'readWrite', db: "prod"}]
+});
+```
 
 ## Kafka 
 
