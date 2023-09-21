@@ -129,7 +129,33 @@ db.createUser({
 });
 ```
 
-## Kafka 
+
+## Kafka
+
+```shell
+docker compose up -d kafka
+```
+
+Create topic:
+
+```shell
+docker exec -it kafka \
+		/opt/bitnami/kafka/bin/kafka-topics.sh \
+		--bootstrap-server $(curl -s ipinfo.io/ip):9092 \
+		--topic order-app-orders --create \
+		--partitions 3 --replication-factor 1
+```
+
+Make sure topic created successfully:
+
+```shell
+docker exec -it kafka \
+		/opt/bitnami/kafka/bin/kafka-topics.sh \
+		--bootstrap-server $(curl -s ipinfo.io/ip):9092 \
+		--describe --topic order-app-orders
+```
+
+## Kafka YC
 
 ```shell
 source .env

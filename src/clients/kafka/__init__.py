@@ -3,6 +3,7 @@ from os import getenv
 
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.errors import NoBrokersAvailable
+
 from src.logger import LogManager
 
 log = LogManager().get_logger(name=__name__)
@@ -15,12 +16,7 @@ class KafkaClient:
 
     def __init__(self) -> None:
         self.properties = dict(
-            bootstrap_servers=f'{getenv("YC_KAFKA_BOOTSTRAP_SERVER")}:{getenv("YC_KAFKA_BOOTSTRAP_SERVER_PORT")}',
-            security_protocol="SASL_SSL",
-            sasl_mechanism="SCRAM-SHA-512",
-            sasl_plain_username=getenv("YC_KAFKA_USERNAME"),
-            sasl_plain_password=getenv("YC_KAFKA_PASSWORD"),
-            ssl_cafile=getenv("CERTIFICATE_PATH"),
+            bootstrap_servers=f'{getenv("KAFKA_HOST")}:{getenv("KAFKA_PORT")}',
         )
 
     def get_producer(self) -> KafkaProducer:
